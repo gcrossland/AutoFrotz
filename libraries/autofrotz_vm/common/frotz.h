@@ -13,7 +13,6 @@
 
 #ifndef __UNIX_PORT_FILE
 #include <signal.h>
-typedef int bool;
 
 #ifndef TRUE
 #define TRUE 1
@@ -594,12 +593,12 @@ int  	os_font_data (int, int *, int *);
 void 	os_init_screen (void);
 void 	os_more_prompt (void);
 int  	os_peek_colour (void);
-int  	os_picture_data (int, int *, int *);
+bool 	os_picture_data (int, int *, int *);
 void 	os_prepare_sample (int);
 void 	os_process_arguments (int, char *[]);
 int	os_random_seed (void);
 int  	os_read_file_name (char *, const char *, int);
-zchar	os_read_key (int, int);
+zchar	os_read_key (int, bool);
 zchar	os_read_line (int, zchar *, int, int, int);
 void 	os_reset_screen (void);
 void 	os_restart_game (int);
@@ -613,5 +612,6 @@ void 	os_stop_sample (int);
 int  	os_string_width (const zchar *);
 void	os_init_setup (void);
 int	os_speech_output(const zchar *);
+zword	os_read_mouse(void);
 
 #include "setup.h"

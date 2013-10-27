@@ -29,7 +29,7 @@
 
 static int error_count[ERR_NUM_ERRORS];
 
-static char *err_messages[] = {
+static const char *err_messages[] = {
     "Text buffer overflow",
     "Store out of dynamic memory",
     "Division by zero",

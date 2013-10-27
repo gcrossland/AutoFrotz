@@ -7,8 +7,6 @@
 
 #include "dumb_frotz.h"
 
-f_setup_t f_setup;
-
 static bool show_line_numbers = FALSE;
 static bool show_line_types = -1;
 static bool show_pictures = TRUE;
@@ -55,14 +53,14 @@ static int cursor_row = 0, cursor_col = 0;
 static enum {
   COMPRESSION_NONE, COMPRESSION_SPANS, COMPRESSION_MAX,
 } compression_mode = COMPRESSION_SPANS;
-static char *compression_names[] = {"NONE", "SPANS", "MAX"};
+static const char *compression_names[] = {"NONE", "SPANS", "MAX"};
 static int hide_lines = 0;
 
 /* Reverse-video display styles.  */
 static enum {
   RV_NONE, RV_DOUBLESTRIKE, RV_UNDERLINE, RV_CAPS,
 } rv_mode = RV_NONE;
-static char *rv_names[] = {"NONE", "DOUBLESTRIKE", "UNDERLINE", "CAPS"};
+static const char *rv_names[] = {"NONE", "DOUBLESTRIKE", "UNDERLINE", "CAPS"};
 static char rv_blank_char = ' ';
 
 static cell *dumb_row(int r)
@@ -498,7 +496,7 @@ static void toggle(bool *var, char val)
 bool dumb_output_handle_setting(const char *setting, bool show_cursor,
 				bool startup)
 {
-  char *p;
+  const char *p;
   int i;
 
   if (!strncmp(setting, "pb", 2)) {
@@ -590,8 +588,8 @@ void dumb_init_output(void)
   if (show_line_types == -1)
     show_line_types = h_version > 3;
 
-  screen_data = malloc(screen_cells * sizeof(cell));
-  screen_changes = malloc(screen_cells);
+  screen_data = (cell *) malloc(screen_cells * sizeof(cell));
+  screen_changes = (char *) malloc(screen_cells);
   os_erase_area(1, 1, h_screen_rows, h_screen_cols);
   memset(screen_changes, 0, screen_cells);
 }

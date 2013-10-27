@@ -64,7 +64,7 @@ static int zoptopt = 0;
 static char *zoptarg = NULL;
 static int zgetopt (int argc, char *argv[], const char *options)
 {
-    static pos = 1;
+    static int pos = 1;
     const char *p;
     if (zoptind >= argc || argv[zoptind][0] != '-' || argv[zoptind][1] == 0)
 	return EOF;

@@ -7,8 +7,6 @@
  */
 #include "dumb_frotz.h"
 
-f_setup_t f_setup;
-
 #define PIC_FILE_HEADER_FLAGS 1
 #define PIC_FILE_HEADER_NUM_IMAGES 4
 #define PIC_FILE_HEADER_ENTRY_SIZE 8
@@ -18,7 +16,7 @@ f_setup_t f_setup;
 #define PIC_HEADER_WIDTH 2
 #define PIC_HEADER_HEIGHT 4
 
-static struct {
+static struct pict_info_struct {
   int z_num;
   int width;
   int height;
@@ -53,12 +51,12 @@ void dumb_init_pictures (char *filename)
     entry_size = lookupb(gheader, PIC_FILE_HEADER_ENTRY_SIZE);
     flags = lookupb(gheader, PIC_FILE_HEADER_FLAGS);
 
-    raw_info = malloc(num_pictures * entry_size);
+    raw_info = (unsigned char *) malloc(num_pictures * entry_size);
 
     if (fread(raw_info, num_pictures * entry_size, 1, file) != 1)
       break;
 
-    pict_info = malloc((num_pictures + 1) * sizeof(*pict_info));
+    pict_info = (pict_info_struct *) malloc((num_pictures + 1) * sizeof(*pict_info));
     pict_info[0].z_num = 0;
     pict_info[0].height = num_pictures;
     pict_info[0].width = lookupw(gheader, PIC_FILE_HEADER_VERSION);

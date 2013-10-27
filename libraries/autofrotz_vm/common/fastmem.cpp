@@ -220,31 +220,31 @@ void init_memory (void)
 	zword release;
 	zbyte serial[6];
     } records[] = {
-	{       SHERLOCK,  21, "871214" },
-	{       SHERLOCK,  26, "880127" },
-	{    BEYOND_ZORK,  47, "870915" },
-	{    BEYOND_ZORK,  49, "870917" },
-	{    BEYOND_ZORK,  51, "870923" },
-	{    BEYOND_ZORK,  57, "871221" },
-	{      ZORK_ZERO, 296, "881019" },
-	{      ZORK_ZERO, 366, "890323" },
-	{      ZORK_ZERO, 383, "890602" },
-	{      ZORK_ZERO, 393, "890714" },
-	{         SHOGUN, 292, "890314" },
-	{         SHOGUN, 295, "890321" },
-	{         SHOGUN, 311, "890510" },
-	{         SHOGUN, 322, "890706" },
-	{         ARTHUR,  54, "890606" },
-	{         ARTHUR,  63, "890622" },
-	{         ARTHUR,  74, "890714" },
-	{        JOURNEY,  26, "890316" },
-	{        JOURNEY,  30, "890322" },
-	{        JOURNEY,  77, "890616" },
-	{        JOURNEY,  83, "890706" },
-	{ LURKING_HORROR, 203, "870506" },
-	{ LURKING_HORROR, 219, "870912" },
-	{ LURKING_HORROR, 221, "870918" },
-	{        UNKNOWN,   0, "------" }
+	{       SHERLOCK,  21, {'8', '7', '1', '2', '1', '4'} },
+	{       SHERLOCK,  26, {'8', '8', '0', '1', '2', '7'} },
+	{    BEYOND_ZORK,  47, {'8', '7', '0', '9', '1', '5'} },
+	{    BEYOND_ZORK,  49, {'8', '7', '0', '9', '1', '7'} },
+	{    BEYOND_ZORK,  51, {'8', '7', '0', '9', '2', '3'} },
+	{    BEYOND_ZORK,  57, {'8', '7', '1', '2', '2', '1'} },
+	{      ZORK_ZERO, 296, {'8', '8', '1', '0', '1', '9'} },
+	{      ZORK_ZERO, 366, {'8', '9', '0', '3', '2', '3'} },
+	{      ZORK_ZERO, 383, {'8', '9', '0', '6', '0', '2'} },
+	{      ZORK_ZERO, 393, {'8', '9', '0', '7', '1', '4'} },
+	{         SHOGUN, 292, {'8', '9', '0', '3', '1', '4'} },
+	{         SHOGUN, 295, {'8', '9', '0', '3', '2', '1'} },
+	{         SHOGUN, 311, {'8', '9', '0', '5', '1', '0'} },
+	{         SHOGUN, 322, {'8', '9', '0', '7', '0', '6'} },
+	{         ARTHUR,  54, {'8', '9', '0', '6', '0', '6'} },
+	{         ARTHUR,  63, {'8', '9', '0', '6', '2', '2'} },
+	{         ARTHUR,  74, {'8', '9', '0', '7', '1', '4'} },
+	{        JOURNEY,  26, {'8', '9', '0', '3', '1', '6'} },
+	{        JOURNEY,  30, {'8', '9', '0', '3', '2', '2'} },
+	{        JOURNEY,  77, {'8', '9', '0', '6', '1', '6'} },
+	{        JOURNEY,  83, {'8', '9', '0', '7', '0', '6'} },
+	{ LURKING_HORROR, 203, {'8', '7', '0', '5', '0', '6'} },
+	{ LURKING_HORROR, 219, {'8', '7', '0', '9', '1', '2'} },
+	{ LURKING_HORROR, 221, {'8', '7', '0', '9', '1', '8'} },
+	{        UNKNOWN,   0, {'-', '-', '-', '-', '-', '-'} }
     };
 
     /* Open story file */
@@ -400,7 +400,7 @@ void init_undo (void)
 
     /* Allocate h_dynamic_size bytes for previous dynamic zmp state
        + 1.5 h_dynamic_size for Quetzal diff + 2. */
-    undo_mem = malloc ((h_dynamic_size * 5) / 2 + 2);
+    undo_mem = (zbyte *) malloc ((h_dynamic_size * 5) / 2 + 2);
     if (undo_mem != NULL) {
 	prev_zmp = undo_mem;
 	undo_diff = undo_mem + h_dynamic_size;
@@ -1047,7 +1047,7 @@ int save_undo (void)
     diff_size = mem_diff (zmp, prev_zmp, h_dynamic_size, undo_diff);
     stack_size = stack + STACK_SIZE - sp;
     do {
-	p = malloc (sizeof (undo_t) + diff_size + stack_size * sizeof (*sp));
+	p = (undo_t *) malloc (sizeof (undo_t) + diff_size + stack_size * sizeof (*sp));
 	if (p == NULL)
 	    free_undo (1);
     } while (!p && undo_count);

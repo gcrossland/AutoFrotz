@@ -5,7 +5,6 @@
  */
 
 #include "dumb_frotz.h"
-f_setup_t f_setup;
 
 static char runtime_usage[] =
   "DUMB-FROTZ runtime help:\n"
@@ -180,7 +179,7 @@ bool dumb_handle_setting(const char *setting, bool show_cursor, bool startup)
  * (that isn't the start of a special character)), and write the
  * first non-command to s.
  * Return true if timed-out.  */
-static bool dumb_read_line(char *s, char *prompt, bool show_cursor,
+static bool dumb_read_line(char *s, const char *prompt, bool show_cursor,
 			   int timeout, enum input_type type,
 			   zchar *continued_line_chars)
 {
@@ -246,7 +245,7 @@ static bool dumb_read_line(char *s, char *prompt, bool show_cursor,
       if (type != INPUT_LINE_CONTINUED)
 	fprintf(stderr, "DUMB-FROTZ: No input to discard\n");
       else {
-	dumb_discard_old_input(strlen(continued_line_chars));
+	dumb_discard_old_input(strlen((char *) continued_line_chars));
 	continued_line_chars[0] = '\0';
 	type = INPUT_LINE;
       }
@@ -281,9 +280,9 @@ static bool dumb_read_line(char *s, char *prompt, bool show_cursor,
 
 /* Read a line that is not part of z-machine input (more prompts and
  * filename requests).  */
-static void dumb_read_misc_line(char *s, char *prompt)
+static void dumb_read_misc_line(char *s, const char *prompt)
 {
-  dumb_read_line(s, prompt, 0, 0, 0, 0);
+  dumb_read_line(s, prompt, 0, 0, INPUT_CHAR, 0);
   /* Remove terminating newline */
   s[strlen(s) - 1] = '\0';
 }
@@ -367,7 +366,7 @@ zchar os_read_line (int max, zchar *buf, int timeout, int width, int continued)
   dumb_display_user_input(read_line_buffer);
 
   /* copy to the buffer and save the rest for next time.  */
-  strcat(buf, read_line_buffer);
+  strcat((char *) buf, read_line_buffer);
   p = read_line_buffer + strlen(read_line_buffer) + 1;
   memmove(read_line_buffer, p, strlen(p) + 1);
     
