@@ -65,11 +65,28 @@ static enum {
 static char *rv_names[] = {"NONE", "DOUBLESTRIKE", "UNDERLINE", "CAPS"};
 static char rv_blank_char = ' ';
 
-static cell *dumb_row(int r) {return screen_data + r * h_screen_cols;}
+static cell *dumb_row(int r)
+{
+  return screen_data + r * h_screen_cols;
+}
+
+/* Given a pointer to a screen data cell in some row, returns a pointer to
+ * the cell at the same column in the next row.  */
+static cell *dumb_row_nextrow(cell *row)
+{
+  return row + h_screen_cols;
+}
 
 static char *dumb_changes_row(int r)
 {
   return screen_changes + r * h_screen_cols;
+}
+
+/* Given a pointer to a screen changes flag byte in some row, returns a
+ * pointer to the flag byte at the same column in the next row.  */
+static char *dumb_changes_row_nextrow(char *changes)
+{
+  return changes + h_screen_cols;
 }
 
 int os_char_width (zchar z)
@@ -105,8 +122,9 @@ void os_set_cursor(int row, int col)
 /* Set a cell and update screen_changes.  */
 static void dumb_set_cell(int row, int col, cell c)
 {
-  dumb_changes_row(row)[col] = (c != dumb_row(row)[col]);
-  dumb_row(row)[col] = c;
+  cell *t = dumb_row(row) + col;
+  dumb_changes_row(row)[col] = (c != *t);
+  *t = c;
 }
 
 void dumb_set_picture_cell(int row, int col, char c)
@@ -144,8 +162,9 @@ static void dumb_display_char(char c)
 void dumb_display_user_input(char *s)
 {
   /* copy to screen without marking it as a change.  */
+  cell *screen_data_i = dumb_row(cursor_row);
   while (*s)
-    dumb_row(cursor_row)[cursor_col++] = make_cell(0, *s++);
+    screen_data_i[cursor_col++] = make_cell(0, *s++);
 }
 
 void dumb_discard_old_input(int num_chars)
@@ -198,11 +217,25 @@ void os_display_string (const zchar *s)
 
 void os_erase_area (int top, int left, int bottom, int right)
 {
-  int row, col;
-  top--; left--; bottom--; right--;
-  for (row = top; row <= bottom; row++)
-    for (col = left; col <= right; col++)
-      dumb_set_cell(row, col, make_cell(current_style, ' '));
+  cell out, *screen_data_i, *screen_data_end, *t;
+  char *screen_changes_i;
+  int c;
+
+  top--; left--;
+  out = make_cell(current_style, ' ');
+  screen_data_i = dumb_row(top);
+  screen_changes_i = dumb_changes_row(top);
+  screen_data_end = dumb_row(bottom);
+
+  while (screen_data_i < screen_data_end) {
+    for (c = left; c < right; c++) {
+      t = screen_data_i + c;
+      screen_changes_i[c] = (*t != out);
+      *t = out;
+    }
+    screen_data_i = dumb_row_nextrow(screen_data_i);
+    screen_changes_i = dumb_changes_row_nextrow(screen_changes_i);
+  }
 }
 
 void os_scroll_area (int top, int left, int bottom, int right, int units)
@@ -234,27 +267,40 @@ void os_set_colour (int x, int y) {}
 void os_set_font (int x) {}
 
 /* Print a cell to stdout.  */
+static void output_putchar(char c)
+{
+  putchar(c);
+}
+
 static void show_cell(cell cel)
 {
   char c = cell_char(cel);
   switch (cell_style(cel)) {
   case 0:
-    putchar(c);
+    output_putchar(c);
     break;
   case PICTURE_STYLE:
-    putchar(show_pictures ? c : ' ');
+    output_putchar(show_pictures ? c : ' ');
     break;
   case REVERSE_STYLE:
     if (c == ' ')
-      putchar(rv_blank_char);
+      output_putchar(rv_blank_char);
     else
       switch (rv_mode) {
-      case RV_NONE: putchar(c); break;
-      case RV_CAPS: putchar(toupper(c)); break;
-      case RV_UNDERLINE: putchar('_'); putchar('\b'); putchar(c); break;
-      case RV_DOUBLESTRIKE: putchar(c); putchar('\b'); putchar(c); break;
+      case RV_NONE: output_putchar(c); break;
+      case RV_CAPS: output_putchar(toupper(c)); break;
+      case RV_UNDERLINE: output_putchar('_'); output_putchar('\b'); output_putchar(c); break;
+      case RV_DOUBLESTRIKE: output_putchar(c); output_putchar('\b'); output_putchar(c); break;
       }
     break;
+  }
+}
+
+static void output_putstring(const char *s)
+{
+  char c;
+  while ((c = *s++) != '\0') {
+    output_putchar(c);
   }
 }
 
@@ -267,13 +313,16 @@ static bool will_print_blank(cell c)
 
 static void show_line_prefix(int row, char c)
 {
-  if (show_line_numbers)
-    printf((row == -1) ? ".." : "%02d", (row + 1) % 100);
+  if (show_line_numbers) {
+    char t[3];
+    sprintf(t, (row == -1) ? ".." : "%02d", (row + 1) % 100);
+    output_putstring(t);
+  }
   if (show_line_types)
-    putchar(c);
+    output_putchar(c);
   /* Add a separator char (unless there's nothing to separate).  */
   if (show_line_numbers || show_line_types)
-    putchar(' ');
+    output_putchar(' ');
 }
 
 /* Print a row to stdout.  */
@@ -283,17 +332,18 @@ static void show_row(int r)
     show_line_prefix(-1, '.');
   } else {
     int c, last;
+    cell *screen_data_i = dumb_row(r);
     show_line_prefix(r, (r == cursor_row) ? ']' : ' ');
     /* Don't print spaces at end of line.  */
     /* (Saves bandwidth and printhead wear.)  */
     /* TODO: compress spaces to tabs.  */
     for (last = h_screen_cols - 1; last >= 0; last--)
-      if (!will_print_blank(dumb_row(r)[last]))
+      if (!will_print_blank(screen_data_i[last]))
 	  break;
     for (c = 0; c <= last; c++)
-      show_cell(dumb_row(r)[c]);
+      show_cell(screen_data_i[c]);
   }
-  putchar('\n');
+  output_putchar('\n');
 }
 
 /* Print the part of the cursor row before the cursor.  */
@@ -301,9 +351,11 @@ void dumb_show_prompt(bool show_cursor, char line_type)
 {
   int i;
   show_line_prefix(show_cursor ? cursor_row : -1, line_type);
-  if (show_cursor)
+  if (show_cursor) {
+    cell *screen_data_i = dumb_row(cursor_row);
     for (i = 0; i < cursor_col; i++)
-      show_cell(dumb_row(cursor_row)[i]);
+      show_cell(screen_data_i[i]);
+  }
 }
 
 static void mark_all_unchanged(void)
@@ -330,6 +382,8 @@ void dumb_show_screen(bool show_cursor)
 {
   int r, c, first, last;
   char changed_rows[0x100]; 
+  cell *screen_data_i;
+  char *screen_changes_i;
 
   /* Easy case */
   if (compression_mode == COMPRESSION_NONE) {
@@ -342,15 +396,19 @@ void dumb_show_screen(bool show_cursor)
   /* Check which rows changed, and where the first and last change is.  */
   first = last = -1;
   memset(changed_rows, 0, h_screen_rows);
+  screen_data_i = dumb_row(hide_lines);
+  screen_changes_i = dumb_changes_row(hide_lines);
   for (r = hide_lines; r < h_screen_rows; r++) { 
     for (c = 0; c < h_screen_cols; c++)
-      if (dumb_changes_row(r)[c] && !is_blank(dumb_row(r)[c]))
+      if (screen_changes_i[c] && !is_blank(screen_data_i[c]))
 	break;
     changed_rows[r] = (c != h_screen_cols);
     if (changed_rows[r]) {
       first = (first != -1) ? first : r;
       last = r;
     }
+    screen_data_i = dumb_row_nextrow(screen_data_i);
+    screen_changes_i = dumb_changes_row_nextrow(screen_changes_i);
   }
 
   if (first == -1)
@@ -358,8 +416,9 @@ void dumb_show_screen(bool show_cursor)
 
   /* The show_cursor rule described above */
   if (show_cursor && (cursor_row == last)) {
+    screen_data_i = dumb_row(last);
     for (c = cursor_col; c < h_screen_cols; c++)
-      if (!is_blank(dumb_row(last)[c]))
+      if (!is_blank(screen_data_i[c]))
 	break;
     if (c == h_screen_cols)
       last--;
@@ -412,10 +471,13 @@ void os_reset_screen(void)
 
 void os_beep (int volume)
 {
-  if (visual_bell)
-    printf("[%s-PITCHED BEEP]\n", (volume == 1) ? "HIGH" : "LOW");
+  if (visual_bell) {
+    char t[21];
+    sprintf(t, "[%s-PITCHED BEEP]\n", (volume == 1) ? "HIGH" : "LOW");
+    output_putstring(t);
+  }
   else
-    putchar('\a'); /* so much for dumb.  */
+    output_putchar('\a'); /* so much for dumb.  */
 }
 
 

@@ -45,9 +45,6 @@
 
 #endif
 
-#define get_c fgetc
-#define put_c fputc
-
 typedef unsigned long zlong;
 
 /*
@@ -85,6 +82,13 @@ static zword frames[STACK_SIZE/4+1];
 /*
  * Macros used to write the files.
  */
+
+#define tell(fp) ftell (fp)
+#define seekto(fp,d) (fseek (fp, d, SEEK_SET) == 0)
+#define seekby(fp,d) (fseek (fp, d, SEEK_CUR) == 0)
+
+#define get_c fgetc
+#define put_c fputc
 
 #define write_byte(fp,b) (put_c (b, fp) != EOF)
 #define write_bytx(fp,b) write_byte (fp, (b) & 0xFF)
@@ -124,6 +128,8 @@ static bool read_long (FILE *f, zlong *result)
 	      ((zlong) c <<  8) |  (zlong) d;
     return TRUE;
 }
+
+#define read_bytes(fp,d,out) (fread (out, d, 1, fp) == 1)
 
 /*
  * Restore a saved game using Quetzal format. Return 2 if OK, 0 if an error
@@ -321,7 +327,7 @@ zword restore_quetzal (FILE *svf, FILE *stf)
 	    case ID_CMem:
 		if (!(progress & GOT_MEMORY))	/* Don't complain if two. */
 		{
-		    (void) fseek (stf, 0, SEEK_SET);
+		    if (!seekto (stf, 0))			return fatal;
 		    i=0;	/* Bytes written to data area. */
 		    for (; currlen > 0; --currlen)
 		    {
@@ -378,7 +384,7 @@ zword restore_quetzal (FILE *svf, FILE *stf)
 		    /* Must be exactly the right size. */
 		    if (currlen == h_dynamic_size)
 		    {
-			if (fread (zmp, currlen, 1, svf) == 1)
+			if (read_bytes (svf, currlen, zmp))
 			{
 			    progress |= GOT_MEMORY;	/* Only on success. */
 			    break;
@@ -391,7 +397,8 @@ zword restore_quetzal (FILE *svf, FILE *stf)
 		/* Fall thru (to default) if already GOT_MEMORY */
 	    /* Unrecognised chunk type; skip it. */
 	    default:
-		(void) fseek (svf, currlen, SEEK_CUR);	/* Skip chunk. */
+		/* Skip chunk. */
+		if (!seekby (svf, currlen))			return fatal;
 		break;
 	}
 	if (skip)
@@ -440,9 +447,9 @@ zword save_quetzal (FILE *svf, FILE *stf)
     if (!write_long (svf, pc << 8)) /* Includes pad. */	return 0;
 
     /* Write `CMem' chunk. */
-    if ((cmempos = ftell (svf)) < 0)			return 0;
+    if ((cmempos = tell (svf)) < 0)			return 0;
     if (!write_chnk (svf, ID_CMem, 0))			return 0;
-    (void) fseek (stf, 0, SEEK_SET);
+    if (!seekto (stf, 0))				return 0;
     /* j holds current run length. */
     for (i=0, j=0, cmemlen=0; i < h_dynamic_size; ++i)
     {
@@ -477,7 +484,7 @@ zword save_quetzal (FILE *svf, FILE *stf)
 	if (!write_byte (svf, 0))			return 0;
 
     /* Write `Stks' chunk. You are not expected to understand this. ;) */
-    if ((stkspos = ftell (svf)) < 0)			return 0;
+    if ((stkspos = tell (svf)) < 0)			return 0;
     if (!write_chnk (svf, ID_Stks, 0))			return 0;
 
     /*
@@ -550,11 +557,11 @@ zword save_quetzal (FILE *svf, FILE *stf)
     ifzslen = 3*8 + 4 + 14 + cmemlen + stkslen;
     if (cmemlen & 1)
 	++ifzslen;
-    (void) fseek (svf,         4, SEEK_SET);
+    if (!seekto (svf,         4))			return 0;
     if (!write_long (svf, ifzslen))			return 0;
-    (void) fseek (svf, cmempos+4, SEEK_SET);
+    if (!seekto (svf, cmempos+4))			return 0;
     if (!write_long (svf, cmemlen))			return 0;
-    (void) fseek (svf, stkspos+4, SEEK_SET);
+    if (!seekto (svf, stkspos+4))			return 0;
     if (!write_long (svf, stkslen))			return 0;
 
     /* After all that, still nothing went wrong! */
