@@ -15,7 +15,7 @@
 #include <time.h>
 
 /* from ../common/setup.h */
-extern f_setup_t f_setup;
+vmlocal extern f_setup_t f_setup;
 
 /* From input.c.  */
 bool is_terminator (zchar);

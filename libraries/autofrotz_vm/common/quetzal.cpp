@@ -55,10 +55,7 @@ typedef unsigned long zlong;
  * therein.
  */
 
-#ifndef AUTOFROTZ
-static
-#endif
-zword frames[STACK_SIZE/4+1];
+vmlocal zword frames[STACK_SIZE/4+1];
 
 /*
  * ID types.

@@ -25,15 +25,15 @@
 #endif
 
 
-zword zargs[8];
-int zargc;
+vmlocal zword zargs[8];
+vmlocal int zargc;
 
-static int finished = 0;
+vmlocal static int finished = 0;
 
 static void __extended__ (void);
 static void __illegal__ (void);
 
-void (*op0_opcodes[0x10]) (void) = {
+vmlocal void (*op0_opcodes[0x10]) (void) = {
     z_rtrue,
     z_rfalse,
     z_print,
@@ -52,7 +52,7 @@ void (*op0_opcodes[0x10]) (void) = {
     z_piracy
 };
 
-void (*op1_opcodes[0x10]) (void) = {
+vmlocal void (*op1_opcodes[0x10]) (void) = {
     z_jz,
     z_get_sibling,
     z_get_child,
@@ -71,7 +71,7 @@ void (*op1_opcodes[0x10]) (void) = {
     z_call_n
 };
 
-void (*var_opcodes[0x40]) (void) = {
+vmlocal void (*var_opcodes[0x40]) (void) = {
     __illegal__,
     z_je,
     z_jl,
@@ -138,7 +138,7 @@ void (*var_opcodes[0x40]) (void) = {
     z_check_arg_count
 };
 
-void (*ext_opcodes[0x1d]) (void) = {
+vmlocal void (*ext_opcodes[0x1d]) (void) = {
     z_save,
     z_restore,
     z_log_shift,

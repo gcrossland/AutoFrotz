@@ -20,10 +20,10 @@
 
 #include "frotz.h"
 
-static long A = 1;
+vmlocal static long A = 1;
 
-static int interval = 0;
-static int counter = 0;
+vmlocal static int interval = 0;
+vmlocal static int counter = 0;
 
 /*
  * seed_random

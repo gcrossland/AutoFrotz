@@ -34,18 +34,18 @@ extern bool is_terminator (zchar);
 
 extern bool read_yes_or_no (const char *);
 
-char script_name[MAX_FILE_NAME + 1] = DEFAULT_SCRIPT_NAME;
-char command_name[MAX_FILE_NAME + 1] = DEFAULT_COMMAND_NAME;
+vmlocal char script_name[MAX_FILE_NAME + 1] = DEFAULT_SCRIPT_NAME;
+vmlocal char command_name[MAX_FILE_NAME + 1] = DEFAULT_COMMAND_NAME;
 
 #ifdef __MSDOS__
-extern char latin1_to_ibm[];
+vmlocal extern char latin1_to_ibm[];
 #endif
 
-static int script_width = 0;
+vmlocal static int script_width = 0;
 
-static FILE *sfp = NULL;
-static FILE *rfp = NULL;
-static FILE *pfp = NULL;
+vmlocal static FILE *sfp = NULL;
+vmlocal static FILE *rfp = NULL;
+vmlocal static FILE *pfp = NULL;
 
 /*
  * script_open
@@ -63,7 +63,7 @@ static FILE *pfp = NULL;
 
 void script_open (void)
 {
-    static bool script_valid = FALSE;
+    vmlocal static bool script_valid = FALSE;
 
     char new_name[MAX_FILE_NAME + 1];
 

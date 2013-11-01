@@ -22,7 +22,7 @@ typedef struct frotz_setup_struct {
 	int err_report_mode;		/* done */
 } f_setup_t;
 
-extern f_setup_t f_setup;
+vmlocal extern f_setup_t f_setup;
 
 
 typedef struct zcode_header_struct {

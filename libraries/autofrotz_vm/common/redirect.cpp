@@ -24,9 +24,9 @@
 
 extern zword get_max_width (zword);
 
-static int depth = -1;
+vmlocal static int depth = -1;
 
-static struct {
+vmlocal static struct {
     zword xsize;
     zword table;
     zword width;

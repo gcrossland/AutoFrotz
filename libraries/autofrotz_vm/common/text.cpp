@@ -26,15 +26,15 @@ enum string_type {
 
 extern zword object_name (zword);
 
-static zchar decoded[10];
-static zword encoded[3];
+vmlocal static zchar decoded[10];
+vmlocal static zword encoded[3];
 
 /* 
  * According to Matteo De Luigi <matteo.de.luigi@libero.it>, 
  * 0xab and 0xbb were in each other's proper positions.
  *   Sat Apr 21, 2001
  */
-static zchar zscii_to_latin1[] = {
+static const zchar zscii_to_latin1[] = {
     0xe4, 0xf6, 0xfc, 0xc4, 0xd6, 0xdc, 0xdf, 0xbb,
     0xab, 0xeb, 0xef, 0xff, 0xcb, 0xcf, 0xe1, 0xe9,
     0xed, 0xf3, 0xfa, 0xfd, 0xc1, 0xc9, 0xcd, 0xd3,
@@ -233,9 +233,9 @@ static void load_string (zword addr, zword length)
 
 static void encode_text (int padding)
 {
-    static zchar again[] = { 'a', 'g', 'a', 'i', 'n', 0 };
-    static zchar examine[] = { 'e', 'x', 'a', 'm', 'i', 'n', 'e', 0 };
-    static zchar wait[] = { 'w', 'a', 'i', 't', 0 };
+    static const zchar again[] = { 'a', 'g', 'a', 'i', 'n', 0 };
+    static const zchar examine[] = { 'e', 'x', 'a', 'm', 'i', 'n', 'e', 0 };
+    static const zchar wait[] = { 'w', 'a', 'i', 't', 0 };
 
     zbyte zchars[12];
     const zchar *ptr = decoded;

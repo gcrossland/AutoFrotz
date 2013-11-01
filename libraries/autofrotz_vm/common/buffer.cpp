@@ -25,10 +25,10 @@ extern void stream_char (zchar);
 extern void stream_word (const zchar *);
 extern void stream_new_line (void);
 
-static zchar buffer[TEXT_BUFFER_SIZE];
-static int bufpos = 0;
+vmlocal static zchar buffer[TEXT_BUFFER_SIZE];
+vmlocal static int bufpos = 0;
 
-static zchar prev_c = 0;
+vmlocal static zchar prev_c = 0;
 
 /*
  * flush_buffer
@@ -39,7 +39,7 @@ static zchar prev_c = 0;
 
 void flush_buffer (void)
 {
-    static bool locked = FALSE;
+    vmlocal static bool locked = FALSE;
 
     /* Make sure we stop when flush_buffer is called from flush_buffer.
        Note that this is difficult to avoid as we might print a newline
@@ -80,7 +80,7 @@ void flush_buffer (void)
 
 void print_char (zchar c)
 {
-    static bool flag = FALSE;
+    vmlocal static bool flag = FALSE;
 
     if (message || ostream_memory || enable_buffering) {
 

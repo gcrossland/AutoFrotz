@@ -28,7 +28,7 @@ using autofrotz::vmlink::ZbyteWriter;
 
 typedef unsigned long zlong;
 
-extern zword frames[];
+vmlocal extern zword frames[];
 
 unsigned int random_statesize (void);
 void random_savestate (unsigned char *buffer);

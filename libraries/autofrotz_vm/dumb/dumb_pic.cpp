@@ -16,14 +16,14 @@
 #define PIC_HEADER_WIDTH 2
 #define PIC_HEADER_HEIGHT 4
 
-static struct pict_info_struct {
+vmlocal static struct pict_info_struct {
   int z_num;
   int width;
   int height;
   int orig_width;
   int orig_height;
 } *pict_info;
-static int num_pictures = 0;
+vmlocal static int num_pictures = 0;
 
 static unsigned char lookupb(unsigned char *p, int n) {return p[n];}
 static unsigned short lookupw(unsigned char *p, int n)

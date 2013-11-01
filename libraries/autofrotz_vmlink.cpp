@@ -17,7 +17,7 @@ DC();
 
 const iu lowerWindowHeadroom = 32;
 
-thread_local VmLink *vmLink = nullptr;
+vmlocal VmLink *vmLink = nullptr;
 
 const string VmLink::EMPTY;
 

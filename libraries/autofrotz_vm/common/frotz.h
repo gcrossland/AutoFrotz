@@ -26,6 +26,9 @@
 
 
 #include <stdio.h>
+#ifdef AUTOFROTZ
+#include "../../autofrotz_vmlink.hpp"
+#endif
 
 
 typedef unsigned char zbyte;
@@ -260,8 +263,8 @@ typedef unsigned char zchar;
 
 #if defined (AMIGA)
 
-extern zbyte *pcp;
-extern zbyte *zmp;
+vmlocal extern zbyte *pcp;
+vmlocal extern zbyte *zmp;
 
 #define lo(v)	((zbyte *)&v)[1]
 #define hi(v)	((zbyte *)&v)[0]
@@ -279,8 +282,8 @@ extern zbyte *zmp;
 
 #if !defined (AMIGA) && !defined (MSDOS_16BIT)
 
-extern zbyte *pcp;
-extern zbyte *zmp;
+vmlocal extern zbyte *pcp;
+vmlocal extern zbyte *zmp;
 
 #define lo(v)	(v & 0xff)
 #define hi(v)	(v >> 8)
@@ -303,88 +306,88 @@ extern zbyte *zmp;
 
 /*** Story file header data ***/
 
-extern zbyte h_version;
-extern zbyte h_config;
-extern zword h_release;
-extern zword h_resident_size;
-extern zword h_start_pc;
-extern zword h_dictionary;
-extern zword h_objects;
-extern zword h_globals;
-extern zword h_dynamic_size;
-extern zword h_flags;
-extern zbyte h_serial[6];
-extern zword h_abbreviations;
-extern zword h_file_size;
-extern zword h_checksum;
-extern zbyte h_interpreter_number;
-extern zbyte h_interpreter_version;
-extern zbyte h_screen_rows;
-extern zbyte h_screen_cols;
-extern zword h_screen_width;
-extern zword h_screen_height;
-extern zbyte h_font_height;
-extern zbyte h_font_width;
-extern zword h_functions_offset;
-extern zword h_strings_offset;
-extern zbyte h_default_background;
-extern zbyte h_default_foreground;
-extern zword h_terminating_keys;
-extern zword h_line_width;
-extern zbyte h_standard_high;
-extern zbyte h_standard_low;
-extern zword h_alphabet;
-extern zword h_extension_table;
-extern zbyte h_user_name[8];
+vmlocal extern zbyte h_version;
+vmlocal extern zbyte h_config;
+vmlocal extern zword h_release;
+vmlocal extern zword h_resident_size;
+vmlocal extern zword h_start_pc;
+vmlocal extern zword h_dictionary;
+vmlocal extern zword h_objects;
+vmlocal extern zword h_globals;
+vmlocal extern zword h_dynamic_size;
+vmlocal extern zword h_flags;
+vmlocal extern zbyte h_serial[6];
+vmlocal extern zword h_abbreviations;
+vmlocal extern zword h_file_size;
+vmlocal extern zword h_checksum;
+vmlocal extern zbyte h_interpreter_number;
+vmlocal extern zbyte h_interpreter_version;
+vmlocal extern zbyte h_screen_rows;
+vmlocal extern zbyte h_screen_cols;
+vmlocal extern zword h_screen_width;
+vmlocal extern zword h_screen_height;
+vmlocal extern zbyte h_font_height;
+vmlocal extern zbyte h_font_width;
+vmlocal extern zword h_functions_offset;
+vmlocal extern zword h_strings_offset;
+vmlocal extern zbyte h_default_background;
+vmlocal extern zbyte h_default_foreground;
+vmlocal extern zword h_terminating_keys;
+vmlocal extern zword h_line_width;
+vmlocal extern zbyte h_standard_high;
+vmlocal extern zbyte h_standard_low;
+vmlocal extern zword h_alphabet;
+vmlocal extern zword h_extension_table;
+vmlocal extern zbyte h_user_name[8];
 
-extern zword hx_table_size;
-extern zword hx_mouse_x;
-extern zword hx_mouse_y;
-extern zword hx_unicode_table;
+vmlocal extern zword hx_table_size;
+vmlocal extern zword hx_mouse_x;
+vmlocal extern zword hx_mouse_y;
+vmlocal extern zword hx_unicode_table;
 
 /*** Various data ***/
 
-extern const char *story_name;
+vmlocal extern const char *story_name;
 
-extern enum story story_id;
-extern long story_size;
+vmlocal extern enum story story_id;
+vmlocal extern long story_size;
 
-extern zword stack[STACK_SIZE];
-extern zword *sp;
-extern zword *fp;
-extern zword frame_count;
+vmlocal extern zword stack[STACK_SIZE];
+vmlocal extern zword *sp;
+vmlocal extern zword *fp;
+vmlocal extern zword frame_count;
 
-extern zword zargs[8];
-extern int zargc;
+vmlocal extern zword zargs[8];
+vmlocal extern int zargc;
 
-extern bool ostream_screen;
-extern bool ostream_script;
-extern bool ostream_memory;
-extern bool ostream_record;
-extern bool istream_replay;
-extern bool message;
+vmlocal extern bool ostream_screen;
+vmlocal extern bool ostream_script;
+vmlocal extern bool ostream_memory;
+vmlocal extern bool ostream_record;
+vmlocal extern bool istream_replay;
+vmlocal extern bool message;
 
-extern int cwin;
-extern int mwin;
+vmlocal extern int cwin;
+vmlocal extern int mwin;
 
-extern int mouse_x;
-extern int mouse_y;
+vmlocal extern int mouse_x;
+vmlocal extern int mouse_y;
 
-extern bool enable_wrapping;
-extern bool enable_scripting;
-extern bool enable_scrolling;
-extern bool enable_buffering;
+vmlocal extern bool enable_wrapping;
+vmlocal extern bool enable_scripting;
+vmlocal extern bool enable_scrolling;
+vmlocal extern bool enable_buffering;
 
 
-extern char *option_zcode_path;	/* dg */
+vmlocal extern char *option_zcode_path;	/* dg */
 
-extern long reserve_mem;
+vmlocal extern long reserve_mem;
 
 
 /*** Blorb stuff ***/
 /*
-bb_err_t       blorb_err;
-bb_map_t       *blorb_map;
+vmlocal bb_err_t       blorb_err;
+vmlocal bb_map_t       *blorb_map;
 */
 
 /*** Z-machine opcodes ***/
@@ -621,7 +624,3 @@ int	os_speech_output(const zchar *);
 zword	os_read_mouse(void);
 
 #include "setup.h"
-
-#ifdef AUTOFROTZ
-#include "../../autofrotz_vmlink.hpp"
-#endif

@@ -10,19 +10,20 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "frotz.h"
 
 #ifndef MSDOS_16BIT
 #define cdecl
 #endif
 
-int optind = 1;
-int optopt = 0;
+vmlocal int optind = 1;
+vmlocal int optopt = 0;
 
-const char *optarg = NULL;
+vmlocal const char *optarg = NULL;
 
 int cdecl getopt (int argc, char *argv[], const char *options)
 {
-    static int pos = 1;
+    vmlocal static int pos = 1;
 
     const char *p;
 

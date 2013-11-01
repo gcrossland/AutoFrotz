@@ -7,13 +7,13 @@
 
 #include "dumb_frotz.h"
 
-static bool show_line_numbers = FALSE;
-static bool show_line_types = -1;
-static bool show_pictures = TRUE;
-static bool visual_bell = TRUE;
-static bool plain_ascii = FALSE;
+vmlocal static bool show_line_numbers = FALSE;
+vmlocal static bool show_line_types = -1;
+vmlocal static bool show_pictures = TRUE;
+vmlocal static bool visual_bell = TRUE;
+vmlocal static bool plain_ascii = FALSE;
 
-static char latin1_to_ascii[] =
+static const char latin1_to_ascii[] =
   "    !   c   L   >o< Y   |   S   ''  C   a   <<  not -   R   _   "
   "^0  +/- ^2  ^3  '   my  P   .   ,   ^1  o   >>  1/4 1/2 3/4 ?   "
   "A   A   A   A   Ae  A   AE  C   E   E   E   E   I   I   I   I   "
@@ -23,12 +23,12 @@ static char latin1_to_ascii[] =
 ;
 
 /* h_screen_rows * h_screen_cols */
-static int screen_cells;
+vmlocal static int screen_cells;
 
 /* The in-memory state of the screen.  */
 /* Each cell contains a style in the upper byte and a char in the lower. */
 typedef unsigned short cell;
-static cell *screen_data;
+vmlocal static cell *screen_data;
 
 static cell make_cell(int style, char c) {return (style << 8) | (0xff & c);}
 static char cell_char(cell c) {return c & 0xff;}
@@ -42,26 +42,26 @@ static int cell_style(cell c) {return c >> 8;}
  * the rv bit some company in that huge byte I allocated for it.)  */
 #define PICTURE_STYLE 16
 
-static int current_style = 0;
+vmlocal static int current_style = 0;
 
 /* Which cells have changed (1 byte per cell).  */
-static char *screen_changes;
+vmlocal static char *screen_changes;
 
-static int cursor_row = 0, cursor_col = 0;
+vmlocal static int cursor_row = 0, cursor_col = 0;
 
 /* Compression styles.  */
-static enum {
+vmlocal static enum {
   COMPRESSION_NONE, COMPRESSION_SPANS, COMPRESSION_MAX,
 } compression_mode = COMPRESSION_SPANS;
-static const char *compression_names[] = {"NONE", "SPANS", "MAX"};
-static int hide_lines = 0;
+static const char *const compression_names[] = {"NONE", "SPANS", "MAX"};
+vmlocal static int hide_lines = 0;
 
 /* Reverse-video display styles.  */
-static enum {
+vmlocal static enum {
   RV_NONE, RV_DOUBLESTRIKE, RV_UNDERLINE, RV_CAPS,
 } rv_mode = RV_NONE;
-static const char *rv_names[] = {"NONE", "DOUBLESTRIKE", "UNDERLINE", "CAPS"};
-static char rv_blank_char = ' ';
+static const char *const rv_names[] = {"NONE", "DOUBLESTRIKE", "UNDERLINE", "CAPS"};
+vmlocal static char rv_blank_char = ' ';
 
 static cell *dumb_row(int r)
 {
@@ -90,7 +90,7 @@ static char *dumb_changes_row_nextrow(char *changes)
 int os_char_width (zchar z)
 {
   if (plain_ascii && z >= ZC_LATIN1_MIN && z <= ZC_LATIN1_MAX) {
-    char *p = latin1_to_ascii + 4 * (z - ZC_LATIN1_MIN);
+    const char *p = latin1_to_ascii + 4 * (z - ZC_LATIN1_MIN);
     return strchr(p, ' ') - p;
   }
   return 1;
@@ -181,7 +181,7 @@ void os_display_char (zchar c)
 {
   if (c >= ZC_LATIN1_MIN && c <= ZC_LATIN1_MAX) {
     if (plain_ascii) {
-      char *ptr = latin1_to_ascii + 4 * (c - ZC_LATIN1_MIN);
+      const char *ptr = latin1_to_ascii + 4 * (c - ZC_LATIN1_MIN);
       do
 	dumb_display_char(*ptr++);
       while (*ptr != ' ');

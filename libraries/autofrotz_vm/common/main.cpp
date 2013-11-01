@@ -42,108 +42,108 @@ extern void reset_memory (void);
 
 /* Story file name, id number and size */
 
-const char *story_name = 0;
+vmlocal const char *story_name = 0;
 
-enum story story_id = UNKNOWN;
-long story_size = 0;
+vmlocal enum story story_id = UNKNOWN;
+vmlocal long story_size = 0;
 
 /* Story file header data */
 
-zbyte h_version = 0;
-zbyte h_config = 0;
-zword h_release = 0;
-zword h_resident_size = 0;
-zword h_start_pc = 0;
-zword h_dictionary = 0;
-zword h_objects = 0;
-zword h_globals = 0;
-zword h_dynamic_size = 0;
-zword h_flags = 0;
-zbyte h_serial[6] = { 0, 0, 0, 0, 0, 0 };
-zword h_abbreviations = 0;
-zword h_file_size = 0;
-zword h_checksum = 0;
-zbyte h_interpreter_number = 0;
-zbyte h_interpreter_version = 0;
-zbyte h_screen_rows = 0;
-zbyte h_screen_cols = 0;
-zword h_screen_width = 0;
-zword h_screen_height = 0;
-zbyte h_font_height = 1;
-zbyte h_font_width = 1;
-zword h_functions_offset = 0;
-zword h_strings_offset = 0;
-zbyte h_default_background = 0;
-zbyte h_default_foreground = 0;
-zword h_terminating_keys = 0;
-zword h_line_width = 0;
-zbyte h_standard_high = 1;
-zbyte h_standard_low = 0;
-zword h_alphabet = 0;
-zword h_extension_table = 0;
-zbyte h_user_name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+vmlocal zbyte h_version = 0;
+vmlocal zbyte h_config = 0;
+vmlocal zword h_release = 0;
+vmlocal zword h_resident_size = 0;
+vmlocal zword h_start_pc = 0;
+vmlocal zword h_dictionary = 0;
+vmlocal zword h_objects = 0;
+vmlocal zword h_globals = 0;
+vmlocal zword h_dynamic_size = 0;
+vmlocal zword h_flags = 0;
+vmlocal zbyte h_serial[6] = { 0, 0, 0, 0, 0, 0 };
+vmlocal zword h_abbreviations = 0;
+vmlocal zword h_file_size = 0;
+vmlocal zword h_checksum = 0;
+vmlocal zbyte h_interpreter_number = 0;
+vmlocal zbyte h_interpreter_version = 0;
+vmlocal zbyte h_screen_rows = 0;
+vmlocal zbyte h_screen_cols = 0;
+vmlocal zword h_screen_width = 0;
+vmlocal zword h_screen_height = 0;
+vmlocal zbyte h_font_height = 1;
+vmlocal zbyte h_font_width = 1;
+vmlocal zword h_functions_offset = 0;
+vmlocal zword h_strings_offset = 0;
+vmlocal zbyte h_default_background = 0;
+vmlocal zbyte h_default_foreground = 0;
+vmlocal zword h_terminating_keys = 0;
+vmlocal zword h_line_width = 0;
+vmlocal zbyte h_standard_high = 1;
+vmlocal zbyte h_standard_low = 0;
+vmlocal zword h_alphabet = 0;
+vmlocal zword h_extension_table = 0;
+vmlocal zbyte h_user_name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-zword hx_table_size = 0;
-zword hx_mouse_x = 0;
-zword hx_mouse_y = 0;
-zword hx_unicode_table = 0;
+vmlocal zword hx_table_size = 0;
+vmlocal zword hx_mouse_x = 0;
+vmlocal zword hx_mouse_y = 0;
+vmlocal zword hx_unicode_table = 0;
 
 /* Stack data */
 
-zword stack[STACK_SIZE];
-zword *sp = 0;
-zword *fp = 0;
-zword frame_count = 0;
+vmlocal zword stack[STACK_SIZE];
+vmlocal zword *sp = 0;
+vmlocal zword *fp = 0;
+vmlocal zword frame_count = 0;
 
 /* IO streams */
 
-bool ostream_screen = TRUE;
-bool ostream_script = FALSE;
-bool ostream_memory = FALSE;
-bool ostream_record = FALSE;
-bool istream_replay = FALSE;
-bool message = FALSE;
+vmlocal bool ostream_screen = TRUE;
+vmlocal bool ostream_script = FALSE;
+vmlocal bool ostream_memory = FALSE;
+vmlocal bool ostream_record = FALSE;
+vmlocal bool istream_replay = FALSE;
+vmlocal bool message = FALSE;
 
 /* Current window and mouse data */
 
-int cwin = 0;
-int mwin = 0;
+vmlocal int cwin = 0;
+vmlocal int mwin = 0;
 
-int mouse_y = 0;
-int mouse_x = 0;
+vmlocal int mouse_y = 0;
+vmlocal int mouse_x = 0;
 
 /* Window attributes */
 
-bool enable_wrapping = FALSE;
-bool enable_scripting = FALSE;
-bool enable_scrolling = FALSE;
-bool enable_buffering = FALSE;
+vmlocal bool enable_wrapping = FALSE;
+vmlocal bool enable_scripting = FALSE;
+vmlocal bool enable_scrolling = FALSE;
+vmlocal bool enable_buffering = FALSE;
 
 /* User options */
 
 /*
-int option_attribute_assignment = 0;
-int option_attribute_testing = 0;
-int option_context_lines = 0;
-int option_object_locating = 0;
-int option_object_movement = 0;
-int option_left_margin = 0;
-int option_right_margin = 0;
-int option_ignore_errors = 0;
-int option_piracy = 0;
-int option_undo_slots = MAX_UNDO_SLOTS;
-int option_expand_abbreviations = 0;
-int option_script_cols = 80;
-int option_save_quetzal = 1;
+vmlocal int option_attribute_assignment = 0;
+vmlocal int option_attribute_testing = 0;
+vmlocal int option_context_lines = 0;
+vmlocal int option_object_locating = 0;
+vmlocal int option_object_movement = 0;
+vmlocal int option_left_margin = 0;
+vmlocal int option_right_margin = 0;
+vmlocal int option_ignore_errors = 0;
+vmlocal int option_piracy = 0;
+vmlocal int option_undo_slots = MAX_UNDO_SLOTS;
+vmlocal int option_expand_abbreviations = 0;
+vmlocal int option_script_cols = 80;
+vmlocal int option_save_quetzal = 1;
 */
 
-int option_sound = 1;
-char *option_zcode_path;
+vmlocal int option_sound = 1;
+vmlocal char *option_zcode_path;
 
 
 /* Size of memory to reserve (in bytes) */
 
-long reserve_mem = 0;
+vmlocal long reserve_mem = 0;
 
 /*
  * z_piracy, branch if the story file is a legal copy.

@@ -64,18 +64,18 @@ extern zword restore_quetzal (FILE *, FILE *);
 
 extern void erase_window (zword);
 
-extern void (*op0_opcodes[]) (void);
-extern void (*op1_opcodes[]) (void);
-extern void (*op2_opcodes[]) (void);
-extern void (*var_opcodes[]) (void);
+vmlocal extern void (*op0_opcodes[]) (void);
+vmlocal extern void (*op1_opcodes[]) (void);
+vmlocal extern void (*op2_opcodes[]) (void);
+vmlocal extern void (*var_opcodes[]) (void);
 
-char save_name[MAX_FILE_NAME + 1] = DEFAULT_SAVE_NAME;
-char auxilary_name[MAX_FILE_NAME + 1] = DEFAULT_AUXILARY_NAME;
+vmlocal char save_name[MAX_FILE_NAME + 1] = DEFAULT_SAVE_NAME;
+vmlocal char auxilary_name[MAX_FILE_NAME + 1] = DEFAULT_AUXILARY_NAME;
 
-zbyte far *zmp = NULL;
-zbyte far *pcp = NULL;
+vmlocal zbyte far *zmp = NULL;
+vmlocal zbyte far *pcp = NULL;
 
-static FILE *story_fp = NULL;
+vmlocal static FILE *story_fp = NULL;
 
 /*
  * Data for the undo mechanism.
@@ -96,10 +96,10 @@ struct undo_struct {
     /* undo diff and stack data follow */
 };
 
-static undo_t *first_undo = NULL, *last_undo = NULL, *curr_undo = NULL;
-static zbyte *undo_mem = NULL, *prev_zmp, *undo_diff;
+vmlocal static undo_t *first_undo = NULL, *last_undo = NULL, *curr_undo = NULL;
+vmlocal static zbyte *undo_mem = NULL, *prev_zmp, *undo_diff;
 
-static int undo_count = 0;
+vmlocal static int undo_count = 0;
 
 /*
  * get_header_extension
@@ -215,7 +215,7 @@ void init_memory (void)
     unsigned n;
     int i, j;
 
-    static struct {
+    static const struct {
 	enum story story_id;
 	zword release;
 	zbyte serial[6];
@@ -539,7 +539,7 @@ void storew (zword addr, zword value)
 
 void z_restart (void)
 {
-    static bool first_restart = TRUE;
+    vmlocal static bool first_restart = TRUE;
 
     flush_buffer ();
 

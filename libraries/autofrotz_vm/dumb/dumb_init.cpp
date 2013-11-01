@@ -7,7 +7,7 @@
 
 #include "dumb_frotz.h"
 
-f_setup_t f_setup;
+vmlocal f_setup_t f_setup;
 
 #define INFORMATION "\
 An interpreter for all Infocom and other Z-Machine games.\n\
@@ -25,7 +25,7 @@ Syntax: dfrotz [options] story-file\n\
   -P   alter piracy opcode     \t -x   expand abbreviations g/x/z"
 
 /*
-static char usage[] = "\
+vmlocal static char usage[] = "\
 \n\
 FROTZ V2.32 - interpreter for all Infocom games. Complies with standard\n\
 1.0 of Graham Nelson's specification. Written by Stefan Jokisch in 1995-7.\n\
@@ -59,12 +59,12 @@ While running, enter \"\\help\" to list the runtime escape sequences.\n\
 
 
 /* A unix-like getopt, but with the names changed to avoid any problems.  */
-static int zoptind = 1;
-static int zoptopt = 0;
-static char *zoptarg = NULL;
+vmlocal static int zoptind = 1;
+vmlocal static int zoptopt = 0;
+vmlocal static char *zoptarg = NULL;
 static int zgetopt (int argc, char *argv[], const char *options)
 {
-    static int pos = 1;
+    vmlocal static int pos = 1;
     const char *p;
     if (zoptind >= argc || argv[zoptind][0] != '-' || argv[zoptind][1] == 0)
 	return EOF;
@@ -93,13 +93,13 @@ error:
     return '?';
 }/* zgetopt */
 
-static int user_screen_width = 75;
-static int user_screen_height = 24;
-static int user_interpreter_number = -1;
-static int user_random_seed = -1;
-static int user_tandy_bit = 0;
-static char *graphics_filename = NULL;
-static bool plain_ascii = FALSE;
+vmlocal static int user_screen_width = 75;
+vmlocal static int user_screen_height = 24;
+vmlocal static int user_interpreter_number = -1;
+vmlocal static int user_random_seed = -1;
+vmlocal static int user_tandy_bit = 0;
+vmlocal static char *graphics_filename = NULL;
+vmlocal static bool plain_ascii = FALSE;
 
 #ifdef AUTOFROTZ
 void os_process_arguments(int argc, char *argv[]) 

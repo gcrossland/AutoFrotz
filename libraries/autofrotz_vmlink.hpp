@@ -130,9 +130,11 @@ class ZbyteWriter {
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
+#define vmlocal /* thread_local */
+
 extern DC();
 extern const iu lowerWindowHeadroom;
-extern thread_local VmLink *vmLink;
+extern vmlocal VmLink *vmLink;
 
 }}
 

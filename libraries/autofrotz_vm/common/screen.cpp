@@ -24,7 +24,7 @@ extern void set_header_extension (int, zword);
 
 extern int direct_call (zword);
 
-static struct {
+static const struct {
     enum story story_id;
     int pic;
     int pic1;
@@ -39,17 +39,17 @@ static struct {
     {   UNKNOWN,  0,   0,   0 }
 };
 
-static int font_height = 1;
-static int font_width = 1;
+vmlocal static int font_height = 1;
+vmlocal static int font_width = 1;
 
-static bool input_redraw = FALSE;
-static bool more_prompts = TRUE;
-static bool discarding = FALSE;
-static bool cursor = TRUE;
+vmlocal static bool input_redraw = FALSE;
+vmlocal static bool more_prompts = TRUE;
+vmlocal static bool discarding = FALSE;
+vmlocal static bool cursor = TRUE;
 
-static int input_window = 0;
+vmlocal static int input_window = 0;
 
-static struct {
+vmlocal static struct {
     zword y_pos;
     zword x_pos;
     zword y_size;

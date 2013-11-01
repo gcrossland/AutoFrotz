@@ -31,13 +31,13 @@
 
 extern int direct_call (zword);
 
-static zword routine = 0;
+vmlocal static zword routine = 0;
 
-static int next_sample = 0;
-static int next_volume = 0;
+vmlocal static int next_sample = 0;
+vmlocal static int next_volume = 0;
 
-static bool locked = FALSE;
-static bool playing = FALSE;
+vmlocal static bool locked = FALSE;
+vmlocal static bool playing = FALSE;
 
 /*
  * init_sound
@@ -63,7 +63,7 @@ void init_sound (void)
 static void start_sample (int number, int volume, int repeats, zword eos)
 {
 
-    static zbyte lh_repeats[] = {
+    static const zbyte lh_repeats[] = {
 	0x00, 0x00, 0x00, 0x01, 0xff,
 	0x00, 0x01, 0x01, 0x01, 0x01,
 	0xff, 0x01, 0x01, 0xff, 0x00,

@@ -6,7 +6,7 @@
 
 #include "dumb_frotz.h"
 
-static char runtime_usage[] =
+static const char runtime_usage[] =
   "DUMB-FROTZ runtime help:\n"
   "  General Commands:\n"
   "    \\help    Show this message.\n"
@@ -52,8 +52,8 @@ static char runtime_usage[] =
   "            (blank) Any other output line.\n"
 ;
 
-static float speed = 1;
-static bool do_more_prompts = TRUE;
+vmlocal static float speed = 1;
+vmlocal static bool do_more_prompts = TRUE;
 
 enum input_type {
   INPUT_CHAR,
@@ -142,7 +142,7 @@ static void translate_special_chars(char *s)
 
 
 /* The time in tenths of seconds that the user is ahead of z time.  */
-static int time_ahead = 0;
+vmlocal static int time_ahead = 0;
 
 /* Called from os_read_key and os_read_line if they have input from
  * a previous call to dumb_read_line.
@@ -280,7 +280,7 @@ static bool dumb_read_line(char *s, const char *prompt, bool show_cursor,
       if (!do_more_prompts)
 	fputs(runtime_usage, stdout);
       else {
-	char *current_page, *next_page;
+	const char *current_page, *next_page;
 	current_page = next_page = runtime_usage;
 	for (;;) {
 	  int i;
@@ -317,10 +317,10 @@ static void dumb_read_misc_line(char *s, const char *prompt)
 /* For allowing the user to input in a single line keys to be returned
  * for several consecutive calls to read_char, with no screen update
  * in between.  Useful for traversing menus.  */
-static char read_key_buffer[INPUT_BUFFER_SIZE];
+vmlocal static char read_key_buffer[INPUT_BUFFER_SIZE];
 
 /* Similar.  Useful for using function key abbreviations.  */
-static char read_line_buffer[INPUT_BUFFER_SIZE];
+vmlocal static char read_line_buffer[INPUT_BUFFER_SIZE];
 
 zchar os_read_key (int timeout, bool show_cursor)
 {
@@ -356,7 +356,7 @@ zchar os_read_line (int max, zchar *buf, int timeout, int width, int continued)
 {
   char *p;
   int terminator;
-  static bool timed_out_last_time;
+  vmlocal static bool timed_out_last_time;
   int timed_out;
 
   /* Discard any keys read for single key input.  */

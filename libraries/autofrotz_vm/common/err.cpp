@@ -25,11 +25,11 @@
    player prefs are specified, or replace report_zstrict_error() 
    completely if you want to change the way errors are reported. */
 
-/* int err_report_mode = ERR_DEFAULT_REPORT_MODE; */
+/* vmlocal int err_report_mode = ERR_DEFAULT_REPORT_MODE; */
 
-static int error_count[ERR_NUM_ERRORS];
+vmlocal static int error_count[ERR_NUM_ERRORS];
 
-static const char *err_messages[] = {
+static const char *const err_messages[] = {
     "Text buffer overflow",
     "Store out of dynamic memory",
     "Division by zero",
