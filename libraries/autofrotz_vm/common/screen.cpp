@@ -135,19 +135,27 @@ static void update_cursor (void)
  *
  */
 
-static void reset_cursor (zword win)
+#ifndef AUTOFROTZ
+static
+#endif
+void reset_cursor_toheight (zword win, int height)
 {
     int lines = 0;
 
     if (h_version <= V4 && win == 0)
 	lines = wp[0].y_size / hi (wp[0].font_size) - 1;
 
-    wp[win].y_cursor = hi (wp[0].font_size) * lines + 1;
+    wp[win].y_cursor = hi (wp[0].font_size) * lines + 1 + height;
     wp[win].x_cursor = wp[win].left + 1;
 
     if (win == cwin)
 	update_cursor ();
 
+}/* reset_cursor_toheight */
+
+static void reset_cursor (zword win)
+{
+  reset_cursor_toheight (win, 0);
 }/* reset_cursor */
 
 /*
@@ -1056,6 +1064,16 @@ void z_erase_window (void)
 	erase_window (winarg0 ());
 
 }/* z_erase_window */
+
+#ifdef AUTOFROTZ
+void erase_window_minustwo (void)
+{
+
+    flush_buffer ();
+    erase_screen (-2);
+
+}/* erase_window_minustwo */
+#endif
 
 /*
  * z_get_cursor, write the cursor coordinates into a table.

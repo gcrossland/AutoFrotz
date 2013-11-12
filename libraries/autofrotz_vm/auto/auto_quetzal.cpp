@@ -20,45 +20,19 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "frotz.h"
+#include "../common/frotz.h"
 
-#ifdef MSDOS_16BIT
-
-#include <alloc.h>
-
-#define malloc(size)	farmalloc (size)
-#define realloc(size,p)	farrealloc (size,p)
-#define free(size)	farfree (size)
-#define memcpy(d,s,n)	_fmemcpy (d,s,n)
-
-#else
-
-#include <stdlib.h>
-
-#ifndef SEEK_SET
-#define SEEK_SET 0
-#define SEEK_CUR 1
-#define SEEK_END 2
-#endif
-
-#define far
-
-#endif
+using std::basic_string;
+using autofrotz::vmlink::ZbyteReader;
+using autofrotz::vmlink::ZbyteWriter;
 
 typedef unsigned long zlong;
 
-/*
- * This is used only by save_quetzal. It probably should be allocated
- * dynamically rather than statically.
- *
- * In AutoFrotz, this is also shared with the mutilated Quetzal code
- * therein.
- */
+extern zword frames[];
 
-#ifndef AUTOFROTZ
-static
-#endif
-zword frames[STACK_SIZE/4+1];
+unsigned int random_statesize (void);
+void random_savestate (unsigned char *buffer);
+void random_restorestate (unsigned char *buffer);
 
 /*
  * ID types.
@@ -69,10 +43,10 @@ zword frames[STACK_SIZE/4+1];
 #define ID_FORM makeid ('F','O','R','M')
 #define ID_IFZS makeid ('I','F','Z','S')
 #define ID_IFhd makeid ('I','F','h','d')
-#define ID_UMem makeid ('U','M','e','m')
 #define ID_CMem makeid ('C','M','e','m')
 #define ID_Stks makeid ('S','t','k','s')
 #define ID_ANNO makeid ('A','N','N','O')
+#define ID_FRng makeid ('F','R','n','g')
 
 /*
  * Various parsing states within restoration.
@@ -86,20 +60,50 @@ zword frames[STACK_SIZE/4+1];
 #define GOT_ERROR	0x80
 
 /*
- * Macros used to write the files.
+ * Interface used to write the files.
  */
 
-#define tell(fp) ftell (fp)
-#define seekto(fp,d) (fseek (fp, d, SEEK_SET) == 0)
-#define seekby(fp,d) (fseek (fp, d, SEEK_CUR) == 0)
+template<typename _T> static long tell (_T &f)
+{
+    return f.tell();
+}
 
-#define get_c fgetc
-#define put_c fputc
+template<typename _T> static bool seekto (_T &f, long offset)
+{
+    return f.seekTo(offset);
+}
 
-#define write_byte(fp,b) (put_c (b, fp) != EOF)
-#define write_bytx(fp,b) write_byte (fp, (b) & 0xFF)
-#define write_word(fp,w) \
-    (write_bytx (fp, (w) >>  8) && write_bytx (fp, (w)))
+template<typename _T> static bool seekby (_T &f, long offset)
+{
+    return f.seekBy(offset);
+}
+
+static int get_c(ZbyteReader &f)
+{
+    return f.getByte();
+}
+
+static int put_c(int c, ZbyteWriter &f)
+{
+    zbyte b = c;
+    f.setByte(b);
+    return b;
+}
+
+static bool write_byte(ZbyteWriter &f, int c)
+{
+    f.setByte(c);
+    return true;
+}
+
+#define write_bytx write_byte
+
+static bool write_word(ZbyteWriter &f, int c)
+{
+    f.setWord(c);
+    return true;
+}
+
 #define write_long(fp,l) \
     (write_bytx (fp, (l) >> 24) && write_bytx (fp, (l) >> 16) && \
      write_bytx (fp, (l) >>  8) && write_bytx (fp, (l)))
@@ -109,40 +113,32 @@ zword frames[STACK_SIZE/4+1];
     (write_byte (fp, 0)         && write_byte (fp, (run)))
 
 /* Read one word from file; return TRUE if OK. */
-static bool read_word (FILE *f, zword *result)
+static bool read_word (ZbyteReader &f, zword *result)
 {
-    int a, b;
+    iu32 w;
+    if ((w = f.getWord()) == EOF) return false;
 
-    if ((a = get_c (f)) == EOF) return FALSE;
-    if ((b = get_c (f)) == EOF) return FALSE;
-
-    *result = ((zword) a << 8) | (zword) b;
-    return TRUE;
+    *result = w;
+    return true;
 }
 
 /* Read one long from file; return TRUE if OK. */
-static bool read_long (FILE *f, zlong *result)
+static bool read_long (ZbyteReader &f, zlong *result)
 {
-    int a, b, c, d;
+    iu32 h, l;
+    if ((h = f.getWord()) == EOF) return false;
+    if ((l = f.getWord()) == EOF) return false;
 
-    if ((a = get_c (f)) == EOF) return FALSE;
-    if ((b = get_c (f)) == EOF) return FALSE;
-    if ((c = get_c (f)) == EOF) return FALSE;
-    if ((d = get_c (f)) == EOF) return FALSE;
-
-    *result = ((zlong) a << 24) | ((zlong) b << 16) |
-	      ((zlong) c <<  8) |  (zlong) d;
-    return TRUE;
+    *result = (static_cast<zlong>(h) << 16) | static_cast<zlong>(l);
+    return true;
 }
-
-#define read_bytes(fp,d,out) (fread (out, d, 1, fp) == 1)
 
 /*
  * Restore a saved game using Quetzal format. Return 2 if OK, 0 if an error
  * occurred before any damage was done, -1 on a fatal error.
  */
 
-zword restore_quetzal (FILE *svf, FILE *stf)
+zword auto_restore_quetzal (ZbyteReader &svf, ZbyteReader &stf)
 {
     zlong ifzslen, currlen, tmpl;
     zlong pc;
@@ -328,6 +324,26 @@ zword restore_quetzal (FILE *svf, FILE *stf)
 		}
 		/* End of `Stks' processing... */
 		break;
+	    /* `FRng' header chunk; restore random number generator state. */
+	    case ID_FRng:
+		if (currlen != random_statesize())
+		{
+		    print_string ("'FRng' chunk size isn't compatible with the random state size.\n");
+		    return fatal;
+		}
+		else
+		{
+		   unsigned char buffer[random_statesize()];
+
+		   for (i = 0; i < random_statesize(); i++)
+		   {
+			if ((x = get_c (svf)) == EOF)		return fatal;
+			*(buffer + i) = (unsigned char) x;
+		   }
+
+		   random_restorestate(buffer);
+		}
+		break;
 	    /* Any more special chunk types must go in HERE or ABOVE. */
 	    /* `CMem' compressed memory chunk; uncompress it. */
 	    case ID_CMem:
@@ -381,26 +397,8 @@ zword restore_quetzal (FILE *svf, FILE *stf)
 		    if (currlen == 0)
 			progress |= GOT_MEMORY;	/* Only if succeeded. */
 		    break;
-	    }
-		/* Fall right thru (to default) if already GOT_MEMORY */
-	    /* `UMem' uncompressed memory chunk; load it. */
-	    case ID_UMem:
-		if (!(progress & GOT_MEMORY))	/* Don't complain if two. */
-		{
-		    /* Must be exactly the right size. */
-		    if (currlen == h_dynamic_size)
-		    {
-			if (read_bytes (svf, currlen, zmp))
-			{
-			    progress |= GOT_MEMORY;	/* Only on success. */
-			    break;
-			}
-		    }
-		    else
-			print_string ("`UMem' chunk wrong size!\n");
-		    /* Fall into default action (skip chunk) on errors. */
 		}
-		/* Fall thru (to default) if already GOT_MEMORY */
+		/* Fall right thru (to default) if already GOT_MEMORY */
 	    /* Unrecognised chunk type; skip it. */
 	    default:
 		/* Skip chunk. */
@@ -429,9 +427,9 @@ zword restore_quetzal (FILE *svf, FILE *stf)
  * Save a game using Quetzal format. Return 1 if OK, 0 if failed.
  */
 
-zword save_quetzal (FILE *svf, FILE *stf)
+zword auto_save_quetzal (ZbyteWriter &svf, ZbyteReader &stf)
 {
-    zlong ifzslen = 0, cmemlen = 0, stkslen = 0;
+    zlong ifzslen = 0, cmemlen = 0, stkslen = 0, frnglen = 0;
     zlong pc;
     zword i, j, n;
     zword nvars, nargs, nstk, *p;
@@ -559,9 +557,25 @@ zword save_quetzal (FILE *svf, FILE *stf)
 	stkslen += 8 + 2 * (nvars + nstk);
     }
 
+    /* Write `FRng' chunk. */
+    frnglen = random_statesize();
+    {
+	unsigned char buffer[frnglen];
+
+	random_savestate(buffer);
+
+	if (!write_chnk (svf, ID_FRng, frnglen))	return 0;
+	for (i = 0; i < frnglen; i++)
+	    if (!write_byte (svf, *(buffer + i)))	return 0;
+	if (frnglen & 1) /* Chunk length must be even. */
+	    if (!write_byte (svf, 0))			return 0;
+    }
+
     /* Fill in variable chunk lengths. */
-    ifzslen = 3*8 + 4 + 14 + cmemlen + stkslen;
+    ifzslen = 4*8 + 4 + 14 + cmemlen + stkslen + frnglen;
     if (cmemlen & 1)
+	++ifzslen;
+    if (frnglen & 1)
 	++ifzslen;
     if (!seekto (svf,         4))			return 0;
     if (!write_long (svf, ifzslen))			return 0;
@@ -572,4 +586,40 @@ zword save_quetzal (FILE *svf, FILE *stf)
 
     /* After all that, still nothing went wrong! */
     return 1;
+}
+
+zword auto_restore_quetzal ()
+{
+    if (!autofrotz::vmlink::vmLink->hasRestoreState ())
+    {
+        print_string ("There is no restore block.\n");
+        return 0;
+    }
+
+    ZbyteReader stateReader = autofrotz::vmlink::vmLink->createRestoreStateReader();
+    ZbyteReader storyReader = autofrotz::vmlink::vmLink->createInitialDynamicMemoryReader();
+    zword r = auto_restore_quetzal (stateReader, storyReader);
+    if (r == 2)
+    {
+        autofrotz::vmlink::vmLink->restoreSucceeded ();
+    }
+    return r;
+}
+
+zword auto_save_quetzal ()
+{
+    if (!autofrotz::vmlink::vmLink->hasSaveState ())
+    {
+        print_string ("There is no save block.\n");
+        return 0;
+    }
+
+    ZbyteWriter stateWriter = autofrotz::vmlink::vmLink->createSaveStateWriter();
+    ZbyteReader storyReader = autofrotz::vmlink::vmLink->createInitialDynamicMemoryReader();
+    zword r = auto_save_quetzal (stateWriter, storyReader);
+    if (r == 1)
+    {
+        autofrotz::vmlink::vmLink->saveSucceeded ();
+    }
+    return r;
 }

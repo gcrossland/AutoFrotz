@@ -265,6 +265,48 @@ void os_set_colour (int x, int y) {}
 void os_set_font (int x) {}
 
 /* Print a cell to stdout.  */
+#ifdef AUTOFROTZ
+static void output_putchar(char c)
+{
+  /* The usage of the output rendering functions in dumb_output.c goes like this:
+     show_cell
+     show_line_prefix
+     show_row
+     dumb_show_prompt (ext only)
+     dumb_show_screen (called from dumb_elide_more_prompt os_reset_screen)
+     dumb_dump_screen (unused)
+     dumb_elide_more_prompt (ext only)
+     os_beep (ext only)
+  */
+  autofrotz::vmlink::vmLink->writeOutput(c);
+}
+
+static void show_cell(cell cel)
+{
+  char c = cell_char(cel);
+  int style = cell_style(cel);
+  if (style != 0) {
+    switch (style) {
+      case PICTURE_STYLE:
+        if (!show_pictures) {
+          c = ' ';
+        }
+        break;
+      case REVERSE_STYLE:
+        if (c == ' ') {
+          c = rv_blank_char;
+        } else {
+          switch (rv_mode) {
+            case RV_CAPS: c = toupper(c); break;
+          }
+        }
+        break;
+    }
+  }
+  
+  output_putchar(c);
+}
+#else
 static void output_putchar(char c)
 {
   putchar(c);
@@ -293,6 +335,7 @@ static void show_cell(cell cel)
     break;
   }
 }
+#endif
 
 static void output_putstring(const char *s)
 {
@@ -493,6 +536,18 @@ static void toggle(bool *var, char val)
   *var = val == '1' || (val != '0' && !*var);
 }
 
+#ifdef AUTOFROTZ
+bool dumb_output_handle_setting(const char *setting, bool show_cursor,
+				bool startup)
+{
+  visual_bell=true;
+  // spans by default; go with this or max?
+  //compression_mode = COMPRESSION_NONE;
+  //show_line_numbers
+  show_line_types=FALSE;
+  return TRUE;
+}
+#else
 bool dumb_output_handle_setting(const char *setting, bool show_cursor,
 				bool startup)
 {
@@ -567,6 +622,7 @@ bool dumb_output_handle_setting(const char *setting, bool show_cursor,
     return FALSE;
   return TRUE;
 }
+#endif
 
 void dumb_init_output(void)
 {

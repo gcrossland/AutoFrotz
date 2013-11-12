@@ -49,6 +49,58 @@ void seed_random (int value)
 }/* seed_random */
 
 /*
+ * random_statesize
+ *
+ * Returns the number of unsigned chars needed to store a
+ * representation of the current random number generator state. This
+ * representation need not be portable between any other build.
+ *
+ */
+
+unsigned int random_statesize (void)
+{
+
+    return sizeof(A) + sizeof(interval) + sizeof(counter);
+
+}/* random_statesize */
+
+/*
+ * random_savestate
+ *
+ * Saves a representation of the current random number generator
+ * state to the given buffer (of size at least random_statesize()).
+ *
+ */
+
+void random_savestate (unsigned char *buffer)
+{
+
+    iu8f *b = buffer;
+    core::set(b, A); b += sizeof(A);
+    core::set(b, interval); b += sizeof(interval);
+    core::set(b, counter); b += sizeof(counter);
+
+}/* random_savestate */
+
+/*
+ * random_restorestate
+ *
+ * Restores the random number generator state from the given buffer
+ * (filled with random_savestate() from this process).
+ *
+ */
+
+void random_restorestate (unsigned char *buffer)
+{
+
+  iu8f *b = buffer;
+  A = core::get<decltype(A)>(b); b += sizeof(A);
+  interval = core::get<decltype(interval)>(b); b += sizeof(interval);
+  counter = core::get<decltype(counter)>(b); b += sizeof(counter);
+
+}/* random_restorestate */
+
+/*
  * z_random, store a random number or set the random number seed.
  *
  *	zargs[0] = range (positive) or seed value (negative)

@@ -42,7 +42,7 @@ extern void reset_memory (void);
 
 /* Story file name, id number and size */
 
-char *story_name = 0;
+const char *story_name = 0;
 
 enum story story_id = UNKNOWN;
 long story_size = 0;
@@ -166,7 +166,11 @@ void z_piracy (void)
  *
  */
 
+#ifdef AUTOFROTZ
+int common_main (int argc, char *argv[])
+#else
 int cdecl main (int argc, char *argv[])
+#endif
 {
 
     os_init_setup ();

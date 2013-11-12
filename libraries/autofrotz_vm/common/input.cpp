@@ -262,6 +262,33 @@ void z_read (void)
     if (h_version >= V5)
 	store (translate_to_zscii (key));
 
+#ifdef AUTOFROTZ
+    extern void erase_window_minustwo (void);
+    extern void reset_cursor_toheight (zword win, int height);
+    extern int cwin;
+
+    /*
+     * This is a reasonably tacky hack to clear the screen just after
+     * the user gives input. Thus, each turn's text is the only thing
+     * on the screen.
+     */
+    erase_window_minustwo ();
+
+    /*
+     * Ideally, we'd reset the cursor to the top of the window, to
+     * give the game the maximum number of lines to render into. The
+     * snag here is that some games assume that the height of the
+     * Z-machine's display is big enough that they can render text at
+     * the top of the window without it obscuring the new text being
+     * displayed at the bottom (e.g. when taking the player's inventory
+     * for the first time in Curses). To fix this, we enforce a gap
+     * between the top and where we start rendering.
+     */
+    reset_cursor_toheight (cwin, autofrotz::vmlink::lowerWindowHeadroom);
+
+    z_new_line();
+#endif
+
 }/* z_read */
 
 /*

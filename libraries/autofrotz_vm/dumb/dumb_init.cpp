@@ -101,6 +101,21 @@ static int user_tandy_bit = 0;
 static char *graphics_filename = NULL;
 static bool plain_ascii = FALSE;
 
+#ifdef AUTOFROTZ
+void os_process_arguments(int argc, char *argv[]) 
+{
+    f_setup.ignore_errors = 1;
+    f_setup.undo_slots = autofrotz::vmlink::vmLink->getUndoDepth();
+    f_setup.script_cols = autofrotz::vmlink::vmLink->getScreenWidth();
+    f_setup.err_report_mode = ERR_REPORT_NEVER;
+    user_screen_width = autofrotz::vmlink::vmLink->getScreenWidth();
+    user_screen_height = autofrotz::vmlink::vmLink->getScreenHeight();
+    user_random_seed = 0xA99F65B3 & 0x7FFF;
+    story_name = autofrotz::vmlink::vmLink->getZcodeFileName();
+
+    dumb_handle_setting(nullptr, FALSE, FALSE);
+}
+#else
 void os_process_arguments(int argc, char *argv[]) 
 {
     int c;
@@ -155,6 +170,7 @@ void os_process_arguments(int argc, char *argv[])
       graphics_filename = argv[zoptind++];
 
 }
+#endif
 
 void os_init_screen(void)
 {
@@ -192,11 +208,19 @@ int os_random_seed (void)
 
 void os_restart_game (int stage) {}
 
+#ifdef AUTOFROTZ
+void os_fatal (const char *s)
+{
+  // DODGY
+  throw core::GeneralException(s);
+}
+#else
 void os_fatal (const char *s)
 {
   fprintf(stderr, "\nFatal error: %s\n", s);
   exit(1);
 }
+#endif
 
 FILE *os_path_open(const char *name, const char *mode)
 {

@@ -62,6 +62,12 @@ enum input_type {
 };
 
 /* get a character.  Exit with no fuss on EOF.  */
+#ifdef AUTOFROTZ
+static int xgetchar(void)
+{
+  return autofrotz::vmlink::vmLink->readInput();
+}
+#else
 static int xgetchar(void)
 {
   int c = getchar();
@@ -74,6 +80,7 @@ static int xgetchar(void)
   }
   return c;
 }
+#endif
 
 /* Read one line, including the newline, into s.  Safely avoids buffer
  * overruns (but that's kind of pointless because there are several
@@ -157,6 +164,14 @@ static void toggle(bool *var, char val)
 }
 
 /* Handle input-related user settings and call dumb_output_handle_setting.  */
+#ifdef AUTOFROTZ
+bool dumb_handle_setting(const char *setting, bool show_cursor, bool startup)
+{
+  do_more_prompts = FALSE;
+  dumb_output_handle_setting(nullptr, FALSE, FALSE);
+  return TRUE;
+}
+#else
 bool dumb_handle_setting(const char *setting, bool show_cursor, bool startup)
 {
   if (!strncmp(setting, "sf", 2)) {
@@ -174,6 +189,7 @@ bool dumb_handle_setting(const char *setting, bool show_cursor, bool startup)
   }
   return TRUE;
 }
+#endif
 
 /* Read a line, processing commands (lines that start with a backslash
  * (that isn't the start of a special character)), and write the
@@ -199,11 +215,22 @@ static bool dumb_read_line(char *s, const char *prompt, bool show_cursor,
   for (;;) {
     char *command;
     if (prompt)
+#ifdef AUTOFROTZ
+      os_display_string((const zchar *) prompt);
+#else
       fputs(prompt, stdout);
+#endif
     else
       dumb_show_prompt(show_cursor, (timeout ? "tTD" : ")>}")[type]);
+#ifdef AUTOFROTZ
+    dumb_show_screen(FALSE);
+#endif
     getline(s);
+#ifdef AUTOFROTZ
+    {
+#else
     if ((s[0] != '\\') || ((s[1] != '\0') && !islower(s[1]))) {
+#endif
       /* Is not a command line.  */
       translate_special_chars(s);
       if (timeout) {

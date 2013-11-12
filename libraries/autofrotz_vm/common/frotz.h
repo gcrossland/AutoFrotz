@@ -266,7 +266,7 @@ extern zbyte *zmp;
 #define lo(v)	((zbyte *)&v)[1]
 #define hi(v)	((zbyte *)&v)[0]
 
-#define SET_WORD(addr,v)  { zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
+#define SET_WORD(addr,v)  { MARK_WORD ((addr)); zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
 #define LOW_WORD(addr,v)  { hi(v) = zmp[addr]; lo(v) = zmp[addr+1]; }
 #define HIGH_WORD(addr,v) { hi(v) = zmp[addr]; lo(v) = zmp[addr+1]; }
 #define CODE_WORD(v)      { hi(v) = *pcp++; lo(v) = *pcp++; }
@@ -285,13 +285,19 @@ extern zbyte *zmp;
 #define lo(v)	(v & 0xff)
 #define hi(v)	(v >> 8)
 
-#define SET_WORD(addr,v)  { zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
+#define SET_WORD(addr,v)  { MARK_WORD ((addr)); zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
 #define LOW_WORD(addr,v)  { v = ((zword) zmp[addr] << 8) | zmp[addr+1]; }
 #define HIGH_WORD(addr,v) { v = ((zword) zmp[addr] << 8) | zmp[addr+1]; }
 #define CODE_WORD(v)      { v = ((zword) pcp[0] << 8) | pcp[1]; pcp += 2; }
 #define GET_PC(v)         { v = pcp - zmp; }
 #define SET_PC(v)         { pcp = zmp + v; }
 
+#endif
+
+#ifdef AUTOFROTZ
+#define MARK_WORD(addr)  { autofrotz::vmlink::vmLink->markWord((addr)); }
+#else
+#define MARK_WORD(addr)
 #endif
 
 
@@ -338,7 +344,7 @@ extern zword hx_unicode_table;
 
 /*** Various data ***/
 
-extern char *story_name;
+extern const char *story_name;
 
 extern enum story story_id;
 extern long story_size;
@@ -615,3 +621,7 @@ int	os_speech_output(const zchar *);
 zword	os_read_mouse(void);
 
 #include "setup.h"
+
+#ifdef AUTOFROTZ
+#include "../../autofrotz_vmlink.hpp"
+#endif

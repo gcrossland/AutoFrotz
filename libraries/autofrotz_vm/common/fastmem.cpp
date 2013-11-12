@@ -376,6 +376,19 @@ void init_memory (void)
     hx_table_size = get_header_extension (HX_TABLE_SIZE);
     hx_unicode_table = get_header_extension (HX_UNICODE_TABLE);
 
+#ifdef AUTOFROTZ
+    /*
+     * Since the main gist of the AutoFrotz interface is to remove
+     * I/O in the system (at least in the common case), dynamic
+     * memory gets cached at startup. This is then used when saving
+     * or restoring via Quetzal blocks (in auto_quetzal.c).
+     * Initially setting up the Z-Machine, restarting or normal
+     * saving and loading is still slow, but these shouldn't be
+     * used much.
+     */
+    autofrotz::vmlink::vmLink->init(story_size, h_dynamic_size, zmp);
+#endif
+
 }/* init_memory */
 
 /*
@@ -509,6 +522,8 @@ void storeb (zword addr, zbyte value)
 
 void storew (zword addr, zword value)
 {
+
+    MARK_WORD (addr);
 
     storeb ((zword) (addr + 0), hi (value));
     storeb ((zword) (addr + 1), lo (value));
@@ -654,6 +669,15 @@ void z_restore (void)
 	    goto finished;
 
 	strcpy (save_name, new_name);
+
+#ifdef AUTOFROTZ
+	if (*new_name == '\1') {
+	    /* We're restoring from a Quetzal block. */
+	    extern zword auto_restore_quetzal (void);
+	    success = auto_restore_quetzal();
+	    goto finished;
+	}
+#endif
 
 	/* Open game file */
 
@@ -945,6 +969,15 @@ void z_save (void)
 	    goto finished;
 
 	strcpy (save_name, new_name);
+
+#ifdef AUTOFROTZ
+	if (*new_name == '\1') {
+	    /* We're making a save to a Quetzal block. */
+	    extern zword auto_save_quetzal (void);
+	    success = auto_save_quetzal();
+	    goto finished;
+	}
+#endif
 
 	/* Open game file */
 
