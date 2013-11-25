@@ -262,7 +262,7 @@ iu32 ZbyteReader::getWord () noexcept {
 
   zbyte h = *(i++);
   zbyte l = *(i++);
-  return (h << 8) | l;
+  return static_cast<zbyte>(h << 8) | l;
 }
 
 ZbyteWriter::ZbyteWriter (std::basic_string<zbyte> &r_b)
@@ -272,7 +272,7 @@ ZbyteWriter::ZbyteWriter (std::basic_string<zbyte> &r_b)
 }
 
 long ZbyteWriter::tell () const noexcept {
-  return i;
+  return static_cast<long>(i);
 }
 
 bool ZbyteWriter::seekTo (long offset) {
@@ -281,13 +281,13 @@ bool ZbyteWriter::seekTo (long offset) {
     return false;
   }
 
-  i = offset;
+  i = static_cast<decltype(size)>(offset);
   iAtEnd = (i == size);
   return true;
 }
 
 bool ZbyteWriter::seekBy (long offset) {
-  return seekTo(i + offset);
+  return seekTo(static_cast<long>(i) + offset);
 }
 
 void ZbyteWriter::setByte (zbyte b) {

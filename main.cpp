@@ -159,7 +159,7 @@ int main (int argc, char *argv[]) {
 }
 
 size_t readLine (char *b, size_t bSize) {
-  fgets(b, bSize, stdin);
+  fgets(b, static_cast<int>(bSize), stdin);
   size_t size = strlen(b);
   if (size > 0 && b[size - 1] == '\n') {
     b[--size] = '\0';
