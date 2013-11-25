@@ -22,10 +22,10 @@ o/autofrotz_vmlink.o: libraries/autofrotz_vmlink.cpp $(AUTOFROTZ_VMLINK_HDRS) | 
 AUTOFROTZ_VM_HDRS=libraries/autofrotz_vm/dumb/dumb_frotz.h libraries/autofrotz_vm/common/frotz.h libraries/autofrotz_vm/common/setup.h $(AUTOFROTZ_VMLINK_HDRS)
 
 o/autofrotz_vm_%.o: libraries/autofrotz_vm/common/%.cpp $(AUTOFROTZ_VM_HDRS) | o
-	gcc $(PLATFORMFLAGS) $(LIBFLAGS) -std=gnu++11 -Wl,--demangle -O0 -gstabs3 -DAUTOFROTZ -x c++ -c $< -o $@
+	gcc $(PLATFORMFLAGS) $(LIBFLAGS) -std=gnu++11 -static -Wl,--demangle -O0 -gdwarf-2 -DAUTOFROTZ -x c++ -c $< -o $@
 
 o/autofrotz_vm_%.o: libraries/autofrotz_vm/auto/%.cpp $(wildcard libraries/autofrotz_vm/dumb/*.cpp) $(AUTOFROTZ_VM_HDRS) | o
-	gcc $(PLATFORMFLAGS) $(LIBFLAGS) -std=gnu++11 -Wl,--demangle -O0 -gstabs3 -DAUTOFROTZ -x c++ -c $< -o $@
+	gcc $(PLATFORMFLAGS) $(LIBFLAGS) -std=gnu++11 -static -Wl,--demangle -O0 -gdwarf-2 -DAUTOFROTZ -x c++ -c $< -o $@
 
 AUTOFROTZ_HDRS=libraries/autofrotz.hpp $(AUTOFROTZ_VMLINK_HDRS) $(AUTOFROTZ_VM_HDRS)
 
