@@ -58,7 +58,6 @@ class VmLink {
   VmLink &operator= (const VmLink &) = delete;
   VmLink (VmLink &&) = delete;
   VmLink &operator= (VmLink &&) = delete;
-  pub ~VmLink () noexcept;
   pub void init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamicMemory);
 
   pub const char *getZcodeFileName () const noexcept;

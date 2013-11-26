@@ -48,17 +48,17 @@ class Vm {
    */
   pub iu16 getDynamicMemorySize () const noexcept;
   /**
-    Gets the Z-machine's dynamic memory.
+    Gets the Z-machine's dynamic memory (valid until ::isAlive() is {@c false}).
    */
   pub const zbyte *getDynamicMemory () const noexcept;
   /**
     Gets the Z-machine's dynamic memory as it looked immediately after loading
-    the Z-code file.
+    the Z-code file (valid until destruction).
    */
   pub const zbyte *getInitialDynamicMemory () const noexcept;
   /**
-    Gets the word set or {@c nullptr}, if not enabled. If a dynamic memory
-    address {@c a} is used as the first byte of a word,
+    Gets the word set (valid until destruction) or {@c nullptr}, if not enabled.
+    If a dynamic memory address {@c a} is used as the first byte of a word,
     {@c (getWordSet()[a >> 3] >> (a & 0x7)) & 0x1} is set.
    */
   pub const iu8f *getWordSet() const noexcept;
@@ -91,12 +91,14 @@ class Vm {
    */
   pub iu getRestoreCount() const noexcept;
   /**
-    Sets the State into which the Z-machine will save when given the filename of
+    Sets the State (valid until the next call to ::setSaveState() or
+    destruction) into which the Z-machine will save when given the filename of
     character U+0001.
    */
   pub void setSaveState(State *state);
   /**
-    Sets the State from which the Z-machine will restore when given the filename
+    Sets the State (valid until the next call to ::setRestoreState() or
+    destruction) from which the Z-machine will restore when given the filename
     of character U+0001.
    */
   pub void setRestoreState(const State *state);

@@ -27,9 +27,6 @@ VmLink::VmLink (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDep
   DW(, "vmlink constructed");
 }
 
-VmLink::~VmLink () noexcept {
-}
-
 void VmLink::init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamicMemory) {
   DW(, "vmlink initing with memorySize ", memorySize, ", dyn. memory size ", dynamicMemorySize);
   this->memorySize = memorySize;

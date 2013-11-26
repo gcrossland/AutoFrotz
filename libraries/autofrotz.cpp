@@ -19,7 +19,7 @@ DC();
 
 Vm::Vm (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
   : vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this] () {
-    DPRE(!vmlink::vmLink);
+    DPRE(!vmlink::vmLink, "a VM has already been created (and more than one is not supported)");
 
     vmlink::vmLink = &vmLink;
 
@@ -59,6 +59,8 @@ iu16 Vm::getDynamicMemorySize () const noexcept {
 }
 
 const zbyte *Vm::getDynamicMemory () const noexcept {
+  DPRE(isAlive(), "VM must be alive");
+
   return vmLink.getDynamicMemory();
 }
 
