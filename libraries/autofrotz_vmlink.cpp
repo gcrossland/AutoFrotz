@@ -15,10 +15,6 @@ using std::rethrow_exception;
 ----------------------------------------------------------------------------- */
 DC();
 
-const iu lowerWindowHeadroom = 32;
-
-vmlocal VmLink *vmLink = nullptr;
-
 const string VmLink::EMPTY;
 
 VmLink::VmLink (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
@@ -310,4 +306,12 @@ void ZbyteWriter::setWord (zword w) {
   }
 }
 
+/* -----------------------------------------------------------------------------
+----------------------------------------------------------------------------- */
+const iu lowerWindowHeadroom = 32;
+
+vmlocal VmLink *vmLink = nullptr;
+
+/* -----------------------------------------------------------------------------
+----------------------------------------------------------------------------- */
 }}
