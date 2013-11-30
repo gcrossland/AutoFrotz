@@ -255,7 +255,7 @@ iu32 ZbyteReader::getWord () noexcept {
 
   zbyte h = *(i++);
   zbyte l = *(i++);
-  return static_cast<zbyte>(h << 8) | l;
+  return static_cast<zword>(static_cast<zword>(h << 8) | l);
 }
 
 ZbyteWriter::ZbyteWriter (std::basic_string<zbyte> &r_b)
