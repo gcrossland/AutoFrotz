@@ -17,8 +17,8 @@ DC();
 
 const string VmLink::EMPTY;
 
-VmLink::VmLink (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
-  : isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
+VmLink::VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
+  : isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
 {
   DW(, "vmlink constructed");
 }
@@ -60,6 +60,7 @@ void VmLink::markWord (zword addr) {
 }
 
 char VmLink::readInput () {
+  DPRE(!isDead);
   DPRE(isRunning);
 
   while (inputI == inputEnd) {
@@ -84,8 +85,10 @@ char VmLink::readInput () {
 }
 
 void VmLink::writeOutput (char c) {
+  DPRE(!!output);
+
   // TODO wrapper for writing whole lines?
-  output.push_back(c);
+  output->push_back(c);
 }
 
 ZbyteReader VmLink::createInitialDynamicMemoryReader () const {
@@ -104,6 +107,7 @@ ZbyteWriter VmLink::createSaveStateWriter () {
 }
 
 void VmLink::saveSucceeded () noexcept {
+  DW(, "a save of size ",saveState->size()," succeeded");
   ++saveCount;
 }
 
@@ -119,6 +123,7 @@ ZbyteReader VmLink::createRestoreStateReader () const {
 }
 
 void VmLink::restoreSucceeded () noexcept {
+  DW(, "a restore of size ",restoreState->size()," succeeded");
   ++restoreCount;
 }
 
@@ -175,12 +180,10 @@ void VmLink::supplyInput (string::const_iterator inputBegin, string::const_itera
   });
 }
 
-void VmLink::resetOutput () noexcept {
-  output.clear();
-}
+void VmLink::setOutput (string *output) {
+  DPRE(!!output, "output must be non-null");
 
-const string &VmLink::getOutput () const noexcept {
-  return output;
+  this->output = output;
 }
 
 void VmLink::setSaveState (std::basic_string<zbyte> *body) {
@@ -197,6 +200,7 @@ void VmLink::resetSaveCount () noexcept {
 
 void VmLink::setRestoreState (const std::basic_string<zbyte> *body) {
   restoreState = body;
+  DW(, "setting up restore state of size ",restoreState->size());
 }
 
 iu VmLink::getRestoreCount () const noexcept {

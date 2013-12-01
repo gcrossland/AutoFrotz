@@ -11,7 +11,7 @@
 int main (int argc, char *argv[]);
 size_t readLine (char *b, size_t bSize);
 void printOutput (const char *begin, const char *end);
-void printOutput (const autofrotz::Vm &vm);
+void printOutput (const std::string &o);
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */

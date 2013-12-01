@@ -17,8 +17,8 @@ const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 ----------------------------------------------------------------------------- */
 DC();
 
-Vm::Vm (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
-  : vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this] () {
+Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, string &r_output)
+  : vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this, &r_output] () {
     DPRE(!vmlink::vmLink, "a VM has already been created (and more than one is not supported)");
 
     vmlink::vmLink = &vmLink;
@@ -26,6 +26,7 @@ Vm::Vm (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool
     exception_ptr failureException;
     try {
       DW(, "started thread");
+      vmLink.setOutput(&r_output);
       common_main(0, nullptr);
     } catch (exception &e) {
       DW(, "exception with msg **", e.what(), "** came out of thread");
@@ -36,7 +37,7 @@ Vm::Vm (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool
     }
     DW(, "vm thread over - failed? ", static_cast<bool>(failureException));
 
-    this->vmLink.completed(failureException);
+    vmLink.completed(failureException);
   }))
 {
   vmLink.waitForInputExhaustion();
@@ -76,21 +77,22 @@ bool Vm::isAlive () const noexcept {
   return vmLink.isAlive();
 }
 
-void Vm::doAction (const std::string &input) {
-  DW(, "doing action **", input.c_str(), "**");
-  vmLink.resetOutput();
+void Vm::doAction (string::const_iterator inputBegin, string::const_iterator inputEnd, string &r_output) {
+  DW(, "doing action **", string(inputBegin, inputEnd).c_str(), "**");
+  vmLink.setOutput(&r_output);
   vmLink.resetSaveCount();
   vmLink.resetRestoreCount();
 
   DW(, "giving input to VM...");
-  vmLink.supplyInput(input.begin(), input.end());
+  vmLink.supplyInput(inputBegin, inputEnd);
   DW(, "... VM has consumed input");
+  DW(, "output was **", r_output.c_str(), "**");
 
   vmLink.checkForFailure();
 }
 
-const string &Vm::getOutput () const noexcept {
-  return vmLink.getOutput();
+void Vm::doAction (const string &input, string &r_output) {
+  doAction(input.begin(), input.end(), r_output);
 }
 
 iu Vm::getSaveCount() const noexcept {

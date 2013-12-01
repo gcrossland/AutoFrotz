@@ -50,14 +50,14 @@ class VmLink {
   // I/O
   prv std::string::const_iterator inputI;
   prv std::string::const_iterator inputEnd;
-  prv std::string output;
+  prv std::string *output;
   // Save and restore states
   prv std::basic_string<zbyte> *saveState;
   iu saveCount;
   prv const std::basic_string<zbyte> *restoreState;
   iu restoreCount;
 
-  pub VmLink (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet);
+  pub VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet);
   VmLink (const VmLink &) = delete;
   VmLink &operator= (const VmLink &) = delete;
   VmLink (VmLink &&) = delete;
@@ -88,8 +88,7 @@ class VmLink {
   pub void checkForFailure () const;
   pub void waitForInputExhaustion ();
   pub void supplyInput (std::string::const_iterator inputBegin, std::string::const_iterator inputEnd);
-  pub void resetOutput () noexcept;
-  pub const std::string &getOutput () const noexcept;
+  pub void setOutput (std::string *output);
   pub void setSaveState (std::basic_string<zbyte> *body);
   pub iu getSaveCount () const noexcept;
   pub void resetSaveCount () noexcept;

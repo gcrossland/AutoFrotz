@@ -33,8 +33,9 @@ class Vm {
     run.
     @param enableWordSet whether ot not the VM will track which addresses are
     accessed as words.
+    @param r_output buffer for the VM's initial output.
   */
-  pub Vm (char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet);
+  pub Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, std::string &r_output);
   Vm (const Vm &) = delete;
   Vm &operator= (const Vm &) = delete;
   Vm (Vm &&) = delete;
@@ -71,17 +72,10 @@ class Vm {
   /**
     Passes input to the Z-machine and waits until it next requests input.
 
-    @param input the input to pass to the Z-machine.
     @throw if the Z-machine failed while performing the action.
   */
-  pub void doAction (const std::string &input);
-  /**
-    Gets the output from the Z-machine during the last action or before the
-    first action.
-
-    @return the output (valid until the next call to ::doAction()).
-  */
-  pub const std::string &getOutput () const noexcept;
+  pub void doAction (std::string::const_iterator inputBegin, std::string::const_iterator inputEnd, std::string &r_output);
+  pub void doAction (const std::string &input, std::string &r_output);
   /**
     Gets the number of successful saves into the current save state during the
     last action.

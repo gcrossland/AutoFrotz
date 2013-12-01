@@ -44,13 +44,15 @@ int main (int argc, char *argv[]) {
   printf("\n\n");
 
   printf("[Initialising Z-machine:]\n");
-  Vm vm(zcodeFileName, WIDTH, HEIGHT, 1, true);
+  string output;
+  Vm vm(zcodeFileName, WIDTH, HEIGHT, 1, true, output);
 
   printf("[Creating %d state slot%s:]\n", STATES, STATES == 1 ? "" : "s");
   State s[STATES];
   is currentSaveIndex = -1, currentRestoreIndex = -1;
 
-  printOutput(vm);
+  printOutput(output);
+  output.clear();
 
   printf("[Checking that Z-machine did not die immediately:]\n");
   if (!vm.isAlive()) {
@@ -103,7 +105,8 @@ int main (int argc, char *argv[]) {
         printf("[New restore slot is %d]\n", currentRestoreIndex);
       }
     } else if (strcmp(inbuffer, "benchmark") == 0) {
-      vm.doAction("verbose\n");
+      vm.doAction("verbose\n", output);
+      output.clear();
 
       const char *const runInput = "east\ntake lamp\nexit\nwest\neast, east\ndrop lamp\nwest\n";
       pair<iu, iu> ts[] = {{2, 2}, {1, 4096}, {16, 256}, {256, 16}, {4096, 1}};
@@ -118,7 +121,8 @@ int main (int argc, char *argv[]) {
         }
         clock_t st = clock();
         for (iu i = 0; i < actions; ++i) {
-          vm.doAction(in);
+          vm.doAction(in, output);
+          output.clear();
         }
         printf("[Run took %f secs]\n", static_cast<double>(clock() - st) / CLOCKS_PER_SEC);
       }
@@ -133,8 +137,9 @@ int main (int argc, char *argv[]) {
       }
 
       try {
-        vm.doAction(in);
-        printOutput(vm);
+        vm.doAction(in, output);
+        printOutput(output);
+        output.clear();
       } catch (exception &e) {
         printf("\n[Action failed (%s)]\n", e.what());
       }
@@ -185,8 +190,7 @@ void printOutput (const char *begin, const char *end) {
   }
 }
 
-void printOutput (const Vm &vm) {
-  const string &o = vm.getOutput();
+void printOutput (const string &o) {
   const char *begin = o.data();
   const char *end = begin + o.size();
   printOutput(begin, end);
