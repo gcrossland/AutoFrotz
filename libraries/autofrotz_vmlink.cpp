@@ -74,6 +74,13 @@ char VmLink::readInput () {
       return isRunning;
     });
 
+    if (isDead) {
+      // We're supposed to be dead, so oblige.
+      DW(, "input got... except we've been told to die");
+      // DODGY
+      throw core::PlainException("VM has been killed");
+    }
+
     {
       char b[(inputEnd - inputI) + 1];
       std::copy(inputI, inputEnd, b);
@@ -127,6 +134,16 @@ void VmLink::restoreSucceeded () noexcept {
   ++restoreCount;
 }
 
+void VmLink::completed (exception_ptr failureException) {
+  DPRE(isRunning);
+
+  unique_lock<mutex> l(lock);
+  isRunning = false;
+  isDead = true;
+  this->failureException = failureException;
+  condVar.notify_one();
+}
+
 iu32 VmLink::getMemorySize () const noexcept {
   return memorySize;
 }
@@ -143,15 +160,15 @@ const zbyte *VmLink::getInitialDynamicMemory () const noexcept {
   return initialDynamicMemory.get();
 }
 
-const iu8f *VmLink::getWordSet() const noexcept {
+const iu8f *VmLink::getWordSet () const noexcept {
   return wordSet.get();
 }
 
-bool VmLink::isAlive() const noexcept {
+bool VmLink::isAlive () const noexcept {
   return !isDead;
 }
 
-void VmLink::checkForFailure() const {
+void VmLink::checkForFailure () const {
   if (failureException) {
     rethrow_exception(failureException);
   }
@@ -211,13 +228,15 @@ void VmLink::resetRestoreCount () noexcept {
   restoreCount = 0;
 }
 
-void VmLink::completed (exception_ptr failureException) {
-  DPRE(isRunning);
+void VmLink::kill () {
+  DPRE(!isRunning);
 
   unique_lock<mutex> l(lock);
-  isRunning = false;
+  if (isDead) {
+    return;
+  }
+  isRunning = true;
   isDead = true;
-  this->failureException = failureException;
   condVar.notify_one();
 }
 

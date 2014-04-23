@@ -78,6 +78,7 @@ class VmLink {
   pub bool hasRestoreState () const noexcept;
   pub ZbyteReader createRestoreStateReader () const;
   pub void restoreSucceeded () noexcept;
+  pub void completed (std::exception_ptr failureException);
 
   pub iu32 getMemorySize () const noexcept;
   pub iu16 getDynamicMemorySize () const noexcept;
@@ -95,7 +96,7 @@ class VmLink {
   pub void setRestoreState (const std::basic_string<zbyte> *body);
   pub iu getRestoreCount () const noexcept;
   pub void resetRestoreCount () noexcept;
-  pub void completed (std::exception_ptr failureException);
+  pub void kill ();
 };
 
 class ZbyteReader {

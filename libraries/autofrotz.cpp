@@ -45,7 +45,11 @@ Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth
 
 Vm::~Vm () noexcept {
   try {
+    DW(, "destructing VM, so asking it do die");
+    vmLink.kill();
+    DW(, "VM told to die; waiting for thread to complete");
     vmThread->join();
+    DW(, "joining completed");
   } catch (...) {
     DW(, "joining failed");
   }
