@@ -102,7 +102,7 @@ vmlocal static char *graphics_filename = NULL;
 vmlocal static bool plain_ascii = FALSE;
 
 #ifdef AUTOFROTZ
-void os_process_arguments(int argc, char *argv[]) 
+void os_process_arguments(int argc, char *argv[])
 {
     f_setup.ignore_errors = 1;
     f_setup.undo_slots = autofrotz::vmlink::vmLink->getUndoDepth();
@@ -116,7 +116,7 @@ void os_process_arguments(int argc, char *argv[])
     dumb_handle_setting(nullptr, FALSE, FALSE);
 }
 #else
-void os_process_arguments(int argc, char *argv[]) 
+void os_process_arguments(int argc, char *argv[])
 {
     int c;
 
@@ -211,8 +211,16 @@ void os_restart_game (int stage) {}
 #ifdef AUTOFROTZ
 void os_fatal (const char *s)
 {
+  std::string msg(s);
+  if (!msg.empty()) {
+    char &c = msg.front();
+    if (c == static_cast<unsigned char>(c)) {
+      c = static_cast<char>(std::tolower(c));
+    }
+  }
+
   // DODGY
-  throw core::GeneralException(s);
+  throw core::PlainException(move(msg));
 }
 #else
 void os_fatal (const char *s)
