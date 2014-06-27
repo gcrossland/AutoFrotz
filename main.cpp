@@ -5,7 +5,7 @@ using std::printf;
 using autofrotz::Vm;
 using autofrotz::State;
 using std::strcmp;
-using std::string;
+using core::u8string;
 using std::pair;
 using std::get;
 using std::exception;
@@ -40,11 +40,11 @@ int main (int argc, char *argv[]) {
 
   printf("[Enter story file name:]\n");
   char zcodeFileName[PATH_MAX];
-  readLine(zcodeFileName, sizeof(zcodeFileName));
+  readLine(reinterpret_cast<char8_t *>(zcodeFileName), sizeof(zcodeFileName));
   printf("\n\n");
 
   printf("[Initialising Z-machine:]\n");
-  string output;
+  u8string output;
   Vm vm(zcodeFileName, WIDTH, HEIGHT, 1, true, output);
 
   printf("[Creating %d state slot%s:]\n", STATES, STATES == 1 ? "" : "s");
@@ -63,12 +63,12 @@ int main (int argc, char *argv[]) {
 
   clock_t st = clock();
   do {
-    char inbuffer[512];
+    char8_t inbuffer[512];
     readLine(inbuffer, sizeof(inbuffer));
 
     // Parse out our own internal commands for setting save and
     // restore state blocks.
-    if (strcmp(inbuffer, "setsave") == 0) {
+    if (strcmp(inbuffer, u8("setsave")) == 0) {
       if (currentSaveIndex == -1) {
         printf("[No current save slot]\n");
       } else {
@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
         vm.setSaveState(s + currentSaveIndex);
         printf("[New save slot is %d]\n", currentSaveIndex);
       }
-    } else if (strcmp(inbuffer, "setrestore") == 0) {
+    } else if (strcmp(inbuffer, u8("setrestore")) == 0) {
       if (currentRestoreIndex == -1) {
         printf("[No current restore slot]\n");
       } else {
@@ -104,18 +104,18 @@ int main (int argc, char *argv[]) {
         vm.setRestoreState(s + currentRestoreIndex);
         printf("[New restore slot is %d]\n", currentRestoreIndex);
       }
-    } else if (strcmp(inbuffer, "benchmark") == 0) {
-      vm.doAction("verbose\n", output);
+    } else if (strcmp(inbuffer, u8("benchmark")) == 0) {
+      vm.doAction(u8("verbose\n"), output);
       output.clear();
 
-      const char *const runInput = "east\ntake lamp\nexit\nwest\neast, east\ndrop lamp\nwest\n";
+      const char8_t *const runInput = u8("east\ntake lamp\nexit\nwest\neast, east\ndrop lamp\nwest\n");
       pair<iu, iu> ts[] = {{2, 2}, {1, 4096}, {16, 256}, {256, 16}, {4096, 1}};
       for (auto t : ts) {
         const iu runsPerAction = get<0>(t);
         const iu actions = get<1>(t);
 
         printf("[Doing %d benchmarking runs for each of %d actions]\n", runsPerAction, actions);
-        string in;
+        u8string in;
         for (iu i = 0; i < runsPerAction; ++i) {
           in.append(runInput);
         }
@@ -129,9 +129,9 @@ int main (int argc, char *argv[]) {
     } else {
       DA(vm.isAlive());
 
-      string in(inbuffer);
-      if (strcmp(inbuffer, ".") == 0) {
-        in = "\1\n";
+      u8string in(inbuffer);
+      if (strcmp(inbuffer, u8(".")) == 0) {
+        in = u8("\1\n");
       } else {
         in.push_back('\n');
       }
@@ -163,20 +163,35 @@ int main (int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-size_t readLine (char *b, size_t bSize) {
-  fgets(b, static_cast<int>(bSize), stdin);
-  size_t size = strlen(b);
+size_t readLine (char8_t *b, size_t bSize) {
+  // TODO convert input from native
+  fgets(reinterpret_cast<char *>(b), static_cast<int>(bSize), stdin);
+  size_t size = 0;
+  for (; b[size] != 0; ++size) {
+    if (b[size] >= 128) {
+      b[size] = '?';
+    }
+  }
   if (size > 0 && b[size - 1] == '\n') {
     b[--size] = '\0';
   }
   return size;
 }
 
-void printOutput (const char *begin, const char *end) {
+int strcmp (const char8_t *o0, const char8_t *o1) {
+  return strcmp(reinterpret_cast<const char *>(o0), reinterpret_cast<const char *>(o1));
+}
+
+int atoi (const char8_t *o) {
+  return atoi(reinterpret_cast<const char *>(o));
+}
+
+void printOutput (const char8_t *begin, const char8_t *end) {
+  // TODO convert output to native
   iu linelen = 0;
   printf("=* ");
   for (auto i = begin; i != end; ++i) {
-    char c = *i;
+    char8_t c = *i;
     if (c == '\n') {
       for (; linelen < WIDTH; linelen++) {
         putchar(' ');
@@ -190,9 +205,9 @@ void printOutput (const char *begin, const char *end) {
   }
 }
 
-void printOutput (const string &o) {
-  const char *begin = o.data();
-  const char *end = begin + o.size();
+void printOutput (const u8string &o) {
+  const char8_t *begin = o.data();
+  const char8_t *end = begin + o.size();
   printOutput(begin, end);
 }
 

@@ -9,7 +9,7 @@ using std::exception_ptr;
 using std::exception;
 using std::current_exception;
 using std::thread;
-using std::string;
+using core::u8string;
 
 const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 
@@ -17,7 +17,7 @@ const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 ----------------------------------------------------------------------------- */
 DC();
 
-Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, string &r_output)
+Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, u8string &r_output)
   : vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this, &r_output] () {
     DPRE(!vmlink::vmLink, "a VM has already been created (and more than one is not supported)");
 
@@ -81,8 +81,8 @@ bool Vm::isAlive () const noexcept {
   return vmLink.isAlive();
 }
 
-void Vm::doAction (string::const_iterator inputBegin, string::const_iterator inputEnd, string &r_output) {
-  DW(, "doing action **", string(inputBegin, inputEnd).c_str(), "**");
+void Vm::doAction (u8string::const_iterator inputBegin, u8string::const_iterator inputEnd, u8string &r_output) {
+  DW(, "doing action **", u8string(inputBegin, inputEnd).c_str(), "**");
   vmLink.setOutput(&r_output);
   vmLink.resetSaveCount();
   vmLink.resetRestoreCount();
@@ -95,7 +95,7 @@ void Vm::doAction (string::const_iterator inputBegin, string::const_iterator inp
   vmLink.checkForFailure();
 }
 
-void Vm::doAction (const string &input, string &r_output) {
+void Vm::doAction (const u8string &input, u8string &r_output) {
   doAction(input.begin(), input.end(), r_output);
 }
 

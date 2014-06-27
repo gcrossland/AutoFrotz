@@ -27,7 +27,7 @@ class ZbyteWriter;
 
 class VmLink {
   // TODO replace std::basic_string
-  prv static const std::string EMPTY;
+  prv static const core::u8string EMPTY;
 
   // VM state + synchronisation stuff
   prv std::mutex lock;
@@ -46,11 +46,12 @@ class VmLink {
   prv iu16f dynamicMemorySize;
   prv const zbyte *dynamicMemory;
   prv std::unique_ptr<zbyte []> initialDynamicMemory;
+  // TODO replace with Bitset
   prv std::unique_ptr<iu8f []> wordSet;
   // I/O
-  prv std::string::const_iterator inputI;
-  prv std::string::const_iterator inputEnd;
-  prv std::string *output;
+  prv core::u8string::const_iterator inputI;
+  prv core::u8string::const_iterator inputEnd;
+  prv core::u8string *output;
   // Save and restore states
   prv std::basic_string<zbyte> *saveState;
   iu saveCount;
@@ -69,8 +70,8 @@ class VmLink {
   pub iu getScreenHeight () const noexcept;
   pub iu getUndoDepth () const noexcept;
   pub void markWord (zword addr);
-  pub char readInput ();
-  pub void writeOutput (char c);
+  pub uchar readInput ();
+  pub void writeOutput (uchar c);
   pub ZbyteReader createInitialDynamicMemoryReader () const;
   pub bool hasSaveState () const noexcept;
   pub ZbyteWriter createSaveStateWriter ();
@@ -88,8 +89,8 @@ class VmLink {
   pub bool isAlive () const noexcept;
   pub void checkForFailure () const;
   pub void waitForInputExhaustion ();
-  pub void supplyInput (std::string::const_iterator inputBegin, std::string::const_iterator inputEnd);
-  pub void setOutput (std::string *output);
+  pub void supplyInput (core::u8string::const_iterator inputBegin, core::u8string::const_iterator inputEnd);
+  pub void setOutput (core::u8string *output);
   pub void setSaveState (std::basic_string<zbyte> *body);
   pub iu getSaveCount () const noexcept;
   pub void resetSaveCount () noexcept;

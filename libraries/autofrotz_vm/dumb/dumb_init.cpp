@@ -220,7 +220,7 @@ void os_fatal (const char *s)
   }
 
   // DODGY
-  throw core::PlainException(move(msg));
+  throw std::runtime_error(move(msg));
 }
 #else
 void os_fatal (const char *s)

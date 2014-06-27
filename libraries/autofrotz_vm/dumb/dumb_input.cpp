@@ -65,7 +65,11 @@ enum input_type {
 #ifdef AUTOFROTZ
 static int xgetchar(void)
 {
-  return autofrotz::vmlink::vmLink->readInput();
+  uchar c = autofrotz::vmlink::vmLink->readInput();
+  if (c > UCHAR_MAX) {
+    os_fatal("Input character not supported");
+  }
+  return c;
 }
 #else
 static int xgetchar(void)
@@ -247,7 +251,7 @@ static bool dumb_read_line(char *s, const char *prompt, bool show_cursor,
     /* Remove the \ and the terminating newline.  */
     command = s + 1;
     command[strlen(command) - 1] = '\0';
-    
+
     if (!strcmp(command, "t")) {
       if (timeout) {
 	time_ahead = 0;
@@ -340,7 +344,7 @@ zchar os_read_key (int timeout, bool show_cursor)
       read_key_buffer[strlen(read_key_buffer) - 1] = '\0';
   } else
     timed_out = check_timeout(timeout);
-    
+
   if (timed_out)
     return ZC_TIME_OUT;
 
@@ -372,12 +376,12 @@ zchar os_read_line (int max, zchar *buf, int timeout, int width, int continued)
 			       buf);
   else
     timed_out = check_timeout(timeout);
-  
+
   if (timed_out) {
     timed_out_last_time = TRUE;
     return ZC_TIME_OUT;
   }
-    
+
   /* find the terminating character.  */
   for (p = read_line_buffer;; p++) {
     if (is_terminator(*p)) {
@@ -396,7 +400,7 @@ zchar os_read_line (int max, zchar *buf, int timeout, int width, int continued)
   strcat((char *) buf, read_line_buffer);
   p = read_line_buffer + strlen(read_line_buffer) + 1;
   memmove(read_line_buffer, p, strlen(p) + 1);
-    
+
   /* If there was just a newline after the terminating character,
    * don't save it.  */
   if ((read_line_buffer[0] == '\r') && (read_line_buffer[1] == '\0'))

@@ -3,7 +3,7 @@
 
 namespace autofrotz { namespace vmlink {
 
-using std::string;
+using core::u8string;
 using std::copy;
 using std::mutex;
 using std::unique_lock;
@@ -15,7 +15,7 @@ using std::rethrow_exception;
 ----------------------------------------------------------------------------- */
 DC();
 
-const string VmLink::EMPTY;
+const u8string VmLink::EMPTY;
 
 VmLink::VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
   : isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
@@ -59,7 +59,7 @@ void VmLink::markWord (zword addr) {
   }
 }
 
-char VmLink::readInput () {
+uchar VmLink::readInput () {
   DPRE(!isDead);
   DPRE(isRunning);
 
@@ -78,24 +78,34 @@ char VmLink::readInput () {
       // We're supposed to be dead, so oblige.
       DW(, "input got... except we've been told to die");
       // DODGY
-      throw core::PlainException("VM has been killed");
+      throw core::PlainException(u8("VM has been killed"));
     }
 
     {
-      char b[(inputEnd - inputI) + 1];
+      char8_t b[(inputEnd - inputI) + 1];
       std::copy(inputI, inputEnd, b);
       b[inputEnd - inputI] = '\0';
       DW(, "input got!! is **", b, "** (of length ", (inputEnd - inputI), ")");
     }
   }
+
+  // TODO make inputI be a uchar iterator
+  DPRE(*inputI < 128);
   return *(inputI++);
 }
 
-void VmLink::writeOutput (char c) {
+void VmLink::writeOutput (uchar c) {
   DPRE(!!output);
 
   // TODO wrapper for writing whole lines?
-  output->push_back(c);
+  DA(c < 256);
+  // TODO make output be a uchar iterator
+  if (c < 128) {
+    output->push_back(static_cast<char8_t>(c));
+  } else {
+    output->push_back(static_cast<char8_t>(((c >> 6) & 0b00011111) | 0b11000000));
+    output->push_back(static_cast<char8_t>((c & 0b00111111) | 0b10000000));
+  }
 }
 
 ZbyteReader VmLink::createInitialDynamicMemoryReader () const {
@@ -181,7 +191,7 @@ void VmLink::waitForInputExhaustion () {
   });
 }
 
-void VmLink::supplyInput (string::const_iterator inputBegin, string::const_iterator inputEnd) {
+void VmLink::supplyInput (u8string::const_iterator inputBegin, u8string::const_iterator inputEnd) {
   DPRE(!isRunning);
 
   unique_lock<mutex> l(lock);
@@ -197,7 +207,7 @@ void VmLink::supplyInput (string::const_iterator inputBegin, string::const_itera
   });
 }
 
-void VmLink::setOutput (string *output) {
+void VmLink::setOutput (u8string *output) {
   DPRE(!!output, "output must be non-null");
 
   this->output = output;

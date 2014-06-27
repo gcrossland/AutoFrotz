@@ -35,7 +35,7 @@ class Vm {
     accessed as words.
     @param r_output buffer for the VM's initial output.
   */
-  pub Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, std::string &r_output);
+  pub Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, core::u8string &r_output);
   Vm (const Vm &) = delete;
   Vm &operator= (const Vm &) = delete;
   Vm (Vm &&) = delete;
@@ -74,8 +74,8 @@ class Vm {
 
     @throw if the Z-machine failed while performing the action.
   */
-  pub void doAction (std::string::const_iterator inputBegin, std::string::const_iterator inputEnd, std::string &r_output);
-  pub void doAction (const std::string &input, std::string &r_output);
+  pub void doAction (core::u8string::const_iterator inputBegin, core::u8string::const_iterator inputEnd, core::u8string &r_output);
+  pub void doAction (const core::u8string &input, core::u8string &r_output);
   /**
     Gets the number of successful saves into the current save state during the
     last action.
