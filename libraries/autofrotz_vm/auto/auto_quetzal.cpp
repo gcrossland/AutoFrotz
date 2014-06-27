@@ -22,7 +22,6 @@
 #include <string.h>
 #include "../common/frotz.h"
 
-using std::basic_string;
 using autofrotz::vmlink::ZbyteReader;
 using autofrotz::vmlink::ZbyteWriter;
 

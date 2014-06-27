@@ -7,7 +7,7 @@ using core::u8string;
 using std::copy;
 using std::mutex;
 using std::unique_lock;
-using std::basic_string;
+using core::string;
 using std::exception_ptr;
 using std::rethrow_exception;
 
@@ -213,7 +213,7 @@ void VmLink::setOutput (u8string *output) {
   this->output = output;
 }
 
-void VmLink::setSaveState (std::basic_string<zbyte> *body) {
+void VmLink::setSaveState (string<zbyte> *body) {
   saveState = body;
 }
 
@@ -225,7 +225,7 @@ void VmLink::resetSaveCount () noexcept {
   saveCount = 0;
 }
 
-void VmLink::setRestoreState (const std::basic_string<zbyte> *body) {
+void VmLink::setRestoreState (const string<zbyte> *body) {
   restoreState = body;
   DW(, "setting up restore state of size ",restoreState->size());
 }
@@ -291,7 +291,7 @@ iu32 ZbyteReader::getWord () noexcept {
   return static_cast<zword>(static_cast<zword>(h << 8) | l);
 }
 
-ZbyteWriter::ZbyteWriter (std::basic_string<zbyte> &r_b)
+ZbyteWriter::ZbyteWriter (string<zbyte> &r_b)
   : r_b(r_b), i(0), iAtEnd(true)
 {
   r_b.clear();

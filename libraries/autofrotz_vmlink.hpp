@@ -26,7 +26,6 @@ class ZbyteReader;
 class ZbyteWriter;
 
 class VmLink {
-  // TODO replace std::basic_string
   prv static const core::u8string EMPTY;
 
   // VM state + synchronisation stuff
@@ -36,7 +35,7 @@ class VmLink {
   prv bool isDead;
   prv std::exception_ptr failureException;
   // VM config
-  prv std::string zcodeFileName;
+  prv core::string<char> zcodeFileName;
   prv iu screenWidth;
   prv iu screenHeight;
   prv iu undoDepth;
@@ -53,9 +52,9 @@ class VmLink {
   prv core::u8string::const_iterator inputEnd;
   prv core::u8string *output;
   // Save and restore states
-  prv std::basic_string<zbyte> *saveState;
+  prv core::string<zbyte> *saveState;
   iu saveCount;
-  prv const std::basic_string<zbyte> *restoreState;
+  prv const core::string<zbyte> *restoreState;
   iu restoreCount;
 
   pub VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet);
@@ -91,10 +90,10 @@ class VmLink {
   pub void waitForInputExhaustion ();
   pub void supplyInput (core::u8string::const_iterator inputBegin, core::u8string::const_iterator inputEnd);
   pub void setOutput (core::u8string *output);
-  pub void setSaveState (std::basic_string<zbyte> *body);
+  pub void setSaveState (core::string<zbyte> *body);
   pub iu getSaveCount () const noexcept;
   pub void resetSaveCount () noexcept;
-  pub void setRestoreState (const std::basic_string<zbyte> *body);
+  pub void setRestoreState (const core::string<zbyte> *body);
   pub iu getRestoreCount () const noexcept;
   pub void resetRestoreCount () noexcept;
   pub void kill ();
@@ -115,11 +114,11 @@ class ZbyteReader {
 };
 
 class ZbyteWriter {
-  prv std::basic_string<zbyte> &r_b;
-  prv std::basic_string<zbyte>::size_type i;
+  prv core::string<zbyte> &r_b;
+  prv core::string<zbyte>::size_type i;
   prv bool iAtEnd;
 
-  pub ZbyteWriter (std::basic_string<zbyte> &r_b);
+  pub ZbyteWriter (core::string<zbyte> &r_b);
   ZbyteWriter (const ZbyteWriter &) = delete;
   ZbyteWriter &operator= (const ZbyteWriter &) = delete;
   pub ZbyteWriter (ZbyteWriter &&) = default;
