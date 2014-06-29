@@ -17,8 +17,8 @@ const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 ----------------------------------------------------------------------------- */
 DC();
 
-Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, u8string &r_output)
-  : vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this, &r_output] () {
+Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, u8string &r_output) :
+  vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this, &r_output] () {
     DPRE(!vmlink::vmLink, "a VM has already been created (and more than one is not supported)");
 
     vmlink::vmLink = &vmLink;

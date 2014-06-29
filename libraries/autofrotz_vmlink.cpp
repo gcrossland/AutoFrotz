@@ -17,8 +17,8 @@ DC();
 
 const u8string VmLink::EMPTY;
 
-VmLink::VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet)
-  : isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
+VmLink::VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet) :
+  isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
 {
   DW(, "vmlink constructed");
 }
@@ -250,8 +250,8 @@ void VmLink::kill () {
   condVar.notify_one();
 }
 
-ZbyteReader::ZbyteReader (const zbyte *begin, const zbyte *end)
-  : begin(begin), end(end), i(begin)
+ZbyteReader::ZbyteReader (const zbyte *begin, const zbyte *end) :
+  begin(begin), end(end), i(begin)
 {
 }
 
@@ -291,8 +291,8 @@ iu32 ZbyteReader::getWord () noexcept {
   return static_cast<zword>(static_cast<zword>(h << 8) | l);
 }
 
-ZbyteWriter::ZbyteWriter (string<zbyte> &r_b)
-  : r_b(r_b), i(0), iAtEnd(true)
+ZbyteWriter::ZbyteWriter (string<zbyte> &r_b) :
+  r_b(r_b), i(0), iAtEnd(true)
 {
   r_b.clear();
 }
