@@ -119,6 +119,10 @@ void State::clear () noexcept {
   body.clear();
 }
 
+bool State::isEmpty () noexcept {
+  return body.empty();
+}
+
 void State::compact () {
   body.shrink_to_fit();
 }

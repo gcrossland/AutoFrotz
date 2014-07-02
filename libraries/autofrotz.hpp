@@ -111,6 +111,10 @@ class State {
   */
   pub void clear () noexcept;
   /**
+    Checks whether or not this contains a saved Z-machine state.
+  */
+  pub bool isEmpty () noexcept;
+  /**
     Minimises the memory usage.
   */
   pub void compact ();
