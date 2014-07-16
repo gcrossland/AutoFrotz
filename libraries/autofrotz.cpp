@@ -10,6 +10,7 @@ using std::exception;
 using std::current_exception;
 using std::thread;
 using core::u8string;
+using bitset::Bitset;
 
 const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 
@@ -73,7 +74,7 @@ const zbyte *Vm::getInitialDynamicMemory () const noexcept {
   return vmLink.getInitialDynamicMemory();
 }
 
-const iu8f *Vm::getWordSet() const noexcept {
+const Bitset *Vm::getWordSet() const noexcept {
   return vmLink.getWordSet();
 }
 

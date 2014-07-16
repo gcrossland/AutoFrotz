@@ -9,6 +9,7 @@
 #include <core.hpp>
 #include <condition_variable>
 #include <mutex>
+#include <bitset.hpp>
 
 namespace autofrotz { namespace vmlink {
 
@@ -45,8 +46,7 @@ class VmLink {
   prv iu16f dynamicMemorySize;
   prv const zbyte *dynamicMemory;
   prv std::unique_ptr<zbyte []> initialDynamicMemory;
-  // TODO replace with Bitset
-  prv std::unique_ptr<iu8f []> wordSet;
+  prv std::unique_ptr<bitset::Bitset> wordSet;
   // I/O
   prv core::u8string::const_iterator inputI;
   prv core::u8string::const_iterator inputEnd;
@@ -84,7 +84,7 @@ class VmLink {
   pub iu16 getDynamicMemorySize () const noexcept;
   pub const zbyte *getDynamicMemory () const noexcept;
   pub const zbyte *getInitialDynamicMemory () const noexcept;
-  pub const iu8f *getWordSet () const noexcept;
+  pub const bitset::Bitset *getWordSet () const noexcept;
   pub bool isAlive () const noexcept;
   pub void checkForFailure () const;
   pub void waitForInputExhaustion ();

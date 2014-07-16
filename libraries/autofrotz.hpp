@@ -62,9 +62,9 @@ class Vm {
   /**
     Gets the word set (valid until destruction) or {@c nullptr}, if not enabled.
     If a dynamic memory address {@c a} is used as the first byte of a word,
-    {@c (getWordSet()[a >> 3] >> (a & 0x7)) & 0x1} is set.
+    bit {@c a} is set.
   */
-  pub const iu8f *getWordSet() const noexcept;
+  pub const bitset::Bitset *getWordSet() const noexcept;
   /**
     Returns whether or not the Z-machine is alive.
   */

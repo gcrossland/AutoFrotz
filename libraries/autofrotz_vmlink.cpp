@@ -10,6 +10,7 @@ using std::unique_lock;
 using core::string;
 using std::exception_ptr;
 using std::rethrow_exception;
+using bitset::Bitset;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
@@ -32,7 +33,7 @@ void VmLink::init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamic
   copy(dynamicMemory, dynamicMemory + dynamicMemorySize, initialDynamicMemory.get());
   DW(, "word set enabled? ", enableWordSet);
   if (enableWordSet) {
-    wordSet.reset(new iu8f[(dynamicMemorySize + 7) >> 3]);
+    wordSet.reset(new Bitset(dynamicMemorySize));
   }
 }
 
@@ -53,9 +54,9 @@ iu VmLink::getUndoDepth () const noexcept {
 }
 
 void VmLink::markWord (zword addr) {
-  iu8f *w = wordSet.get();
+  Bitset *w = wordSet.get();
   if (w) {
-    w[addr >> 3] |= static_cast<iu8f>(1 << (addr & 0x7));
+    w->setCapacitatedBit(addr);
   }
 }
 
@@ -170,7 +171,7 @@ const zbyte *VmLink::getInitialDynamicMemory () const noexcept {
   return initialDynamicMemory.get();
 }
 
-const iu8f *VmLink::getWordSet () const noexcept {
+const Bitset *VmLink::getWordSet () const noexcept {
   return wordSet.get();
 }
 

@@ -1,7 +1,7 @@
 # CMD_RM CMD_MKDIR CMD_CP LIBCACHEDIR PLATFORM CONFIG FLAGS
 AUTOFROTZ_MAJ=1
 AUTOFROTZ_MIN=0
-LIBS=core-1.0
+LIBS=core-1.0 bitset-1.0
 
 PLATFORMFLAGS::=-D$(PLATFORM)
 LIBFLAGS::=$(foreach o,$(LIBS),-I$(LIBCACHEDIR)/$(o)/include) $(foreach o,$(LIBS),-L$(LIBCACHEDIR)/$(o)/lib-$(CONFIG)) $(foreach o,$(shell parselibs libnames $(LIBS)),-l$(o))
