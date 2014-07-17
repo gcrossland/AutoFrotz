@@ -56,7 +56,7 @@ iu VmLink::getUndoDepth () const noexcept {
 void VmLink::markWord (zword addr) {
   Bitset *w = wordSet.get();
   if (w) {
-    w->setCapacitatedBit(addr);
+    w->setExistingBit(addr);
   }
 }
 
