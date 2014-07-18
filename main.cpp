@@ -79,7 +79,11 @@ int main (int argc, char *argv[]) {
       readLine(inbuffer, sizeof(inbuffer));
       int index = atoi(inbuffer);
 
-      if (index < 0 || index >= STATES) {
+      if (index == -1) {
+        currentSaveIndex = -1;
+        vm.setSaveState(nullptr);
+        printf("[No new save slot]\n");
+      } else if (index < 0 || index >= STATES) {
         printf("[Error: invalid state index]\n");
       } else {
         currentSaveIndex = index;
@@ -97,7 +101,11 @@ int main (int argc, char *argv[]) {
       readLine(inbuffer, sizeof(inbuffer));
       int index = atoi(inbuffer);
 
-      if (index < 0 || index >= STATES) {
+      if (index == -1) {
+        currentRestoreIndex = -1;
+        vm.setRestoreState(nullptr);
+        printf("[No new restore slot]\n");
+      } else if (index < 0 || index >= STATES) {
         printf("[Error: invalid state index]\n");
       } else {
         currentRestoreIndex = index;

@@ -214,7 +214,7 @@ void VmLink::setOutput (u8string *output) {
   this->output = output;
 }
 
-void VmLink::setSaveState (string<zbyte> *body) {
+void VmLink::setSaveState (string<zbyte> *body) noexcept {
   saveState = body;
 }
 
@@ -226,9 +226,9 @@ void VmLink::resetSaveCount () noexcept {
   saveCount = 0;
 }
 
-void VmLink::setRestoreState (const string<zbyte> *body) {
+void VmLink::setRestoreState (const string<zbyte> *body) noexcept {
   restoreState = body;
-  DW(, "setting up restore state of size ",restoreState->size());
+  DW(, "setting up restore state of size ",restoreState ? static_cast<is64>(restoreState->size()) : -1);
 }
 
 iu VmLink::getRestoreCount () const noexcept {

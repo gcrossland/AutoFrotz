@@ -591,7 +591,7 @@ zword auto_restore_quetzal ()
 {
     if (!autofrotz::vmlink::vmLink->hasRestoreState ())
     {
-        print_string ("There is no restore block.\n");
+        print_string ("There is no State to restore from.\n");
         return 0;
     }
 
@@ -609,7 +609,7 @@ zword auto_save_quetzal ()
 {
     if (!autofrotz::vmlink::vmLink->hasSaveState ())
     {
-        print_string ("There is no save block.\n");
+        print_string ("There is no State to save to.\n");
         return 0;
     }
 

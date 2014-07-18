@@ -74,7 +74,7 @@ const zbyte *Vm::getInitialDynamicMemory () const noexcept {
   return vmLink.getInitialDynamicMemory();
 }
 
-const Bitset *Vm::getWordSet() const noexcept {
+const Bitset *Vm::getWordSet () const noexcept {
   return vmLink.getWordSet();
 }
 
@@ -100,20 +100,20 @@ void Vm::doAction (const u8string &input, u8string &r_output) {
   doAction(input.begin(), input.end(), r_output);
 }
 
-iu Vm::getSaveCount() const noexcept {
+iu Vm::getSaveCount () const noexcept {
   return vmLink.getSaveCount();
 }
 
-iu Vm::getRestoreCount() const noexcept {
+iu Vm::getRestoreCount () const noexcept {
   return vmLink.getRestoreCount();
 }
 
-void Vm::setSaveState(State *state) {
-  vmLink.setSaveState(&(state->body));
+void Vm::setSaveState (State *state) noexcept {
+  vmLink.setSaveState(state ? &state->body : nullptr);
 }
 
-void Vm::setRestoreState(const State *state) {
-  vmLink.setRestoreState(&(state->body));
+void Vm::setRestoreState (const State *state) noexcept {
+  vmLink.setRestoreState(state ? &state->body : nullptr);
 }
 
 void State::clear () noexcept {

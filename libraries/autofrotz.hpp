@@ -64,7 +64,7 @@ class Vm {
     If a dynamic memory address {@c a} is used as the first byte of a word,
     bit {@c a} is set.
   */
-  pub const bitset::Bitset *getWordSet() const noexcept;
+  pub const bitset::Bitset *getWordSet () const noexcept;
   /**
     Returns whether or not the Z-machine is alive.
   */
@@ -80,24 +80,24 @@ class Vm {
     Gets the number of successful saves into the current save state during the
     last action.
   */
-  pub iu getSaveCount() const noexcept;
+  pub iu getSaveCount () const noexcept;
   /**
     Gets the number of successful restorations into the current restore state
     during the last action.
   */
-  pub iu getRestoreCount() const noexcept;
+  pub iu getRestoreCount () const noexcept;
   /**
     Sets the State (valid until the next call to ::setSaveState() or
     destruction) into which the Z-machine will save when given the filename of
-    character U+0001.
+    character U+0001 or sets such saving to fail, if {@c nullptr}.
   */
-  pub void setSaveState(State *state);
+  pub void setSaveState (State *state) noexcept;
   /**
     Sets the State (valid until the next call to ::setRestoreState() or
     destruction) from which the Z-machine will restore when given the filename
-    of character U+0001.
+    of character U+0001 or sets such restoration to fail, if {@c nullptr}.
   */
-  pub void setRestoreState(const State *state);
+  pub void setRestoreState (const State *state) noexcept;
 };
 
 /**

@@ -90,10 +90,10 @@ class VmLink {
   pub void waitForInputExhaustion ();
   pub void supplyInput (core::u8string::const_iterator inputBegin, core::u8string::const_iterator inputEnd);
   pub void setOutput (core::u8string *output);
-  pub void setSaveState (core::string<zbyte> *body);
+  pub void setSaveState (core::string<zbyte> *body) noexcept;
   pub iu getSaveCount () const noexcept;
   pub void resetSaveCount () noexcept;
-  pub void setRestoreState (const core::string<zbyte> *body);
+  pub void setRestoreState (const core::string<zbyte> *body) noexcept;
   pub iu getRestoreCount () const noexcept;
   pub void resetRestoreCount () noexcept;
   pub void kill ();
