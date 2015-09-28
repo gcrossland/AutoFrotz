@@ -11,6 +11,7 @@ using core::string;
 using std::exception_ptr;
 using std::rethrow_exception;
 using bitset::Bitset;
+using std::move;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
@@ -19,9 +20,12 @@ DC();
 const u8string VmLink::EMPTY;
 
 VmLink::VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet) :
-  isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), enableWordSet(enableWordSet), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
+  isRunning(true), isDead(false), zcodeFileName(zcodeFileName), screenWidth(screenWidth), screenHeight(screenHeight), undoDepth(undoDepth), memorySize(0), dynamicMemorySize(0), dynamicMemory(nullptr), initialDynamicMemory(nullptr), wordSet(nullptr), inputI(EMPTY.end()), inputEnd(inputI), output(nullptr), saveState(nullptr), saveCount(0), restoreState(nullptr), restoreCount(0)
 {
   DW(, "vmlink constructed");
+  if (enableWordSet) {
+    wordSet.reset(new Bitset());
+  }
 }
 
 void VmLink::init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamicMemory) {
@@ -31,9 +35,9 @@ void VmLink::init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamic
   this->dynamicMemory = dynamicMemory;
   initialDynamicMemory.reset(new zbyte[dynamicMemorySize]);
   copy(dynamicMemory, dynamicMemory + dynamicMemorySize, initialDynamicMemory.get());
-  DW(, "word set enabled? ", enableWordSet);
-  if (enableWordSet) {
-    wordSet.reset(new Bitset(dynamicMemorySize));
+  DW(, "word set enabled? ", !!wordSet.get());
+  if (wordSet.get()) {
+    wordSet->ensureWidth(dynamicMemorySize);
   }
 }
 
@@ -173,6 +177,15 @@ const zbyte *VmLink::getInitialDynamicMemory () const noexcept {
 
 const Bitset *VmLink::getWordSet () const noexcept {
   return wordSet.get();
+}
+
+void VmLink::setWordSet (Bitset &&initialWordSet) {
+  wordSet.reset(new Bitset(move(initialWordSet)));
+  wordSet->ensureWidth(dynamicMemorySize);
+}
+
+void VmLink::disableWordSet () noexcept {
+  wordSet.reset();
 }
 
 bool VmLink::isAlive () const noexcept {

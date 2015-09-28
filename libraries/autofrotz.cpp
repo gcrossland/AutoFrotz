@@ -11,6 +11,7 @@ using std::current_exception;
 using std::thread;
 using core::u8string;
 using bitset::Bitset;
+using std::move;
 
 const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 
@@ -76,6 +77,14 @@ const zbyte *Vm::getInitialDynamicMemory () const noexcept {
 
 const Bitset *Vm::getWordSet () const noexcept {
   return vmLink.getWordSet();
+}
+
+void Vm::setWordSet (Bitset &&wordSet) {
+  vmLink.setWordSet(move(wordSet));
+}
+
+void Vm::disableWordSet () noexcept {
+  vmLink.disableWordSet();
 }
 
 bool Vm::isAlive () const noexcept {
