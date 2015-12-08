@@ -1,7 +1,8 @@
 #include "autofrotz.hpp"
-
 // from Frotz
 extern int common_main (int argc, char *argv[]);
+
+LIB_DEPENDENCIES
 
 namespace autofrotz {
 
@@ -12,8 +13,6 @@ using std::thread;
 using core::u8string;
 using bitset::Bitset;
 using std::move;
-
-const core::Version VERSION{LIB_MAJ, LIB_MIN}; DEPENDENCIES;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
