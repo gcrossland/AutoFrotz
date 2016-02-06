@@ -89,7 +89,7 @@ uchar VmLink::readInput () {
     {
       char8_t b[(inputEnd - inputI) + 1];
       std::copy(inputI, inputEnd, b);
-      b[inputEnd - inputI] = '\0';
+      b[inputEnd - inputI] = u8("\0")[0];
       DW(, "input got!! is **", b, "** (of length ", (inputEnd - inputI), ")");
     }
   }

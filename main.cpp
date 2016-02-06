@@ -141,7 +141,7 @@ int main (int argc, char *argv[]) {
       if (strcmp(inbuffer, u8(".")) == 0) {
         in = u8("\1\n");
       } else {
-        in.push_back('\n');
+        in.push_back(u8("\n")[0]);
       }
 
       try {
@@ -172,16 +172,18 @@ int main (int argc, char *argv[]) {
 }
 
 size_t readLine (char8_t *b, size_t bSize) {
+  fflush(stdout);
+
   // TODO convert input from native
   fgets(reinterpret_cast<char *>(b), static_cast<int>(bSize), stdin);
   size_t size = 0;
   for (; b[size] != 0; ++size) {
     if (b[size] >= 128) {
-      b[size] = '?';
+      b[size] = u8("?")[0];
     }
   }
-  if (size > 0 && b[size - 1] == '\n') {
-    b[--size] = '\0';
+  if (size > 0 && b[size - 1] == u8("\n")[0]) {
+    b[--size] = u8("\0")[0];
   }
   return size;
 }
@@ -200,7 +202,7 @@ void printOutput (const char8_t *begin, const char8_t *end) {
   printf("=* ");
   for (auto i = begin; i != end; ++i) {
     char8_t c = *i;
-    if (c == '\n') {
+    if (c == u8("\n")[0]) {
       for (; linelen < WIDTH; linelen++) {
         putchar(' ');
       }

@@ -1,7 +1,7 @@
 /** @file */
 /* -----------------------------------------------------------------------------
    AutoFrotz VmLink Library
-   © Geoff Crossland 2003, 2006, 2013-2015
+   © Geoff Crossland 2003, 2006, 2013-2016
 ----------------------------------------------------------------------------- */
 #ifndef AUTOFROTZ_VMLINK_ALREADYINCLUDED
 #define AUTOFROTZ_VMLINK_ALREADYINCLUDED
