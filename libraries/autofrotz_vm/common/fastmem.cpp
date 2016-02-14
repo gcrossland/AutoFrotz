@@ -386,7 +386,7 @@ void init_memory (void)
      * saving and loading is still slow, but these shouldn't be
      * used much.
      */
-    autofrotz::vmlink::vmLink->init(story_size, h_dynamic_size, zmp);
+    vmLink->init(story_size, h_dynamic_size, zmp);
 #endif
 
 }/* init_memory */
@@ -462,7 +462,7 @@ static void free_undo (int count)
 
 void reset_memory (void)
 {
-    if (story_fp) 
+    if (story_fp)
 	fclose (story_fp);
     story_fp = NULL;
 

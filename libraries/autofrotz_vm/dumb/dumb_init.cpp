@@ -105,13 +105,13 @@ vmlocal static bool plain_ascii = FALSE;
 void os_process_arguments(int argc, char *argv[])
 {
     f_setup.ignore_errors = 1;
-    f_setup.undo_slots = autofrotz::vmlink::vmLink->getUndoDepth();
-    f_setup.script_cols = autofrotz::vmlink::vmLink->getScreenWidth();
+    f_setup.undo_slots = vmLink->getUndoDepth();
+    f_setup.script_cols = vmLink->getScreenWidth();
     f_setup.err_report_mode = ERR_REPORT_NEVER;
-    user_screen_width = autofrotz::vmlink::vmLink->getScreenWidth();
-    user_screen_height = autofrotz::vmlink::vmLink->getScreenHeight();
+    user_screen_width = vmLink->getScreenWidth();
+    user_screen_height = vmLink->getScreenHeight();
     user_random_seed = 0xA99F65B3 & 0x7FFF;
-    story_name = autofrotz::vmlink::vmLink->getZcodeFileName();
+    story_name = vmLink->getZcodeFileName();
 
     dumb_handle_setting(nullptr, FALSE, FALSE);
 }

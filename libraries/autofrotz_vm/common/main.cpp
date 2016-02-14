@@ -40,6 +40,10 @@ extern void init_process (void);
 extern void init_sound (void);
 extern void reset_memory (void);
 
+#ifdef AUTOFROTZ
+vmlocal autofrotz::vmlink::VmLink *vmLink = nullptr;
+#endif
+
 /* Story file name, id number and size */
 
 vmlocal const char *story_name = 0;
@@ -167,11 +171,19 @@ void z_piracy (void)
  */
 
 #ifdef AUTOFROTZ
-int common_main (int argc, char *argv[])
+int common_main (autofrotz::vmlink::VmLink *vmLink)
 #else
 int cdecl main (int argc, char *argv[])
 #endif
 {
+
+#ifdef AUTOFROTZ
+    DPRE(!::vmLink, "a VM has already been created (and more than one is not supported)");
+    ::vmLink = vmLink;
+
+    int argc = 0;
+    char **argv = nullptr;
+#endif
 
     os_init_setup ();
 

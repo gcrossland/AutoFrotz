@@ -65,7 +65,7 @@ enum input_type {
 #ifdef AUTOFROTZ
 static int xgetchar(void)
 {
-  uchar c = autofrotz::vmlink::vmLink->readInput();
+  uchar c = vmLink->readInput();
   if (c > UCHAR_MAX) {
     os_fatal("Input character not supported");
   }

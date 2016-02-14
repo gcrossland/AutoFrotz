@@ -1,6 +1,6 @@
 #include "autofrotz.hpp"
 // from Frotz
-extern int common_main (int argc, char *argv[]);
+extern int common_main (autofrotz::vmlink::VmLink *vmLink);
 
 LIB_DEPENDENCIES
 
@@ -20,15 +20,11 @@ DC();
 
 Vm::Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, u8string &r_output) :
   vmLink(zcodeFileName, screenWidth, screenHeight, undoDepth, enableWordSet), vmThread(new thread([this, &r_output] () {
-    DPRE(!vmlink::vmLink, "a VM has already been created (and more than one is not supported)");
-
-    vmlink::vmLink = &vmLink;
-
     exception_ptr failureException;
     try {
       DW(, "started thread");
       vmLink.setOutput(&r_output);
-      common_main(0, nullptr);
+      common_main(&vmLink);
     } catch (exception &e) {
       DW(, "exception with msg **", e.what(), "** came out of thread");
       failureException = current_exception();

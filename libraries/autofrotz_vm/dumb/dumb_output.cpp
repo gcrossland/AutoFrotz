@@ -209,7 +209,7 @@ void os_display_string (const zchar *s)
     else if (c == ZC_NEW_STYLE)
       os_set_text_style(*s++);
     else {
-     os_display_char (c); 
+     os_display_char (c);
      }
 }
 
@@ -278,7 +278,7 @@ static void output_putchar(char c)
      dumb_elide_more_prompt (ext only)
      os_beep (ext only)
   */
-  autofrotz::vmlink::vmLink->writeOutput(c);
+  vmLink->writeOutput(c);
 }
 
 static void show_cell(cell cel)
@@ -303,7 +303,7 @@ static void show_cell(cell cel)
         break;
     }
   }
-  
+
   output_putchar(c);
 }
 #else
@@ -422,7 +422,7 @@ static bool is_blank(cell c)
 void dumb_show_screen(bool show_cursor)
 {
   int r, c, first, last;
-  char changed_rows[0x100]; 
+  char changed_rows[0x100];
   cell *screen_data_i;
   char *screen_changes_i;
 
@@ -439,7 +439,7 @@ void dumb_show_screen(bool show_cursor)
   memset(changed_rows, 0, h_screen_rows);
   screen_data_i = dumb_row(hide_lines);
   screen_changes_i = dumb_changes_row(hide_lines);
-  for (r = hide_lines; r < h_screen_rows; r++) { 
+  for (r = hide_lines; r < h_screen_rows; r++) {
     for (c = 0; c < h_screen_cols; c++)
       if (screen_changes_i[c] && !is_blank(screen_data_i[c]))
 	break;
@@ -467,7 +467,7 @@ void dumb_show_screen(bool show_cursor)
 
   /* Display the appropriate rows.  */
   if (compression_mode == COMPRESSION_MAX) {
-    for (r = first; r <= last; r++) 
+    for (r = first; r <= last; r++)
       if (changed_rows[r])
 	show_row(r);
   } else {

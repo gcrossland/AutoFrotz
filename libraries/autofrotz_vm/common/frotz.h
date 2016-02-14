@@ -257,6 +257,10 @@ typedef unsigned char zchar;
 
 /*** Data access macros ***/
 
+#ifdef AUTOFROTZ
+vmlocal extern autofrotz::vmlink::VmLink *vmLink;
+#endif
+
 #define SET_BYTE(addr,v)  { zmp[addr] = v; }
 #define LOW_BYTE(addr,v)  { v = zmp[addr]; }
 #define CODE_BYTE(v)	  { v = *pcp++;    }
@@ -298,7 +302,7 @@ vmlocal extern zbyte *zmp;
 #endif
 
 #ifdef AUTOFROTZ
-#define MARK_WORD(addr)  { autofrotz::vmlink::vmLink->markWord((addr)); }
+#define MARK_WORD(addr)  { ::vmLink->markWord((addr)); }
 #else
 #define MARK_WORD(addr)
 #endif
@@ -509,7 +513,7 @@ void 	z_window_style (void);
 
 void	init_err (void);
 void	runtime_error (int);
- 
+
 /* Error codes */
 #define ERR_TEXT_BUF_OVF 1	/* Text buffer overflow */
 #define ERR_STORE_RANGE 2	/* Store out of dynamic memory */
@@ -547,7 +551,7 @@ void	runtime_error (int);
 #define ERR_REMOVE_OBJECT_0 31	/* @remove_object called with object 0 */
 #define ERR_GET_NEXT_PROP_0 32	/* @get_next_prop called with object 0 */
 #define ERR_NUM_ERRORS (32)
- 
+
 /* There are four error reporting modes: never report errors;
   report only the first time a given error type occurs; report
   every time an error occurs; or treat all errors as fatal

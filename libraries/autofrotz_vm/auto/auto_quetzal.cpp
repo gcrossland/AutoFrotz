@@ -589,36 +589,36 @@ zword auto_save_quetzal (ZbyteWriter &svf, ZbyteReader &stf)
 
 zword auto_restore_quetzal ()
 {
-    if (!autofrotz::vmlink::vmLink->hasRestoreState ())
+    if (!vmLink->hasRestoreState ())
     {
         print_string ("There is no State to restore from.\n");
         return 0;
     }
 
-    ZbyteReader stateReader = autofrotz::vmlink::vmLink->createRestoreStateReader();
-    ZbyteReader storyReader = autofrotz::vmlink::vmLink->createInitialDynamicMemoryReader();
+    ZbyteReader stateReader = vmLink->createRestoreStateReader();
+    ZbyteReader storyReader = vmLink->createInitialDynamicMemoryReader();
     zword r = auto_restore_quetzal (stateReader, storyReader);
     if (r == 2)
     {
-        autofrotz::vmlink::vmLink->restoreSucceeded ();
+        vmLink->restoreSucceeded ();
     }
     return r;
 }
 
 zword auto_save_quetzal ()
 {
-    if (!autofrotz::vmlink::vmLink->hasSaveState ())
+    if (!vmLink->hasSaveState ())
     {
         print_string ("There is no State to save to.\n");
         return 0;
     }
 
-    ZbyteWriter stateWriter = autofrotz::vmlink::vmLink->createSaveStateWriter();
-    ZbyteReader storyReader = autofrotz::vmlink::vmLink->createInitialDynamicMemoryReader();
+    ZbyteWriter stateWriter = vmLink->createSaveStateWriter();
+    ZbyteReader storyReader = vmLink->createInitialDynamicMemoryReader();
     zword r = auto_save_quetzal (stateWriter, storyReader);
     if (r == 1)
     {
-        autofrotz::vmlink::vmLink->saveSucceeded ();
+        vmLink->saveSucceeded ();
     }
     return r;
 }
