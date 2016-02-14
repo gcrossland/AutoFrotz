@@ -57,10 +57,6 @@ class VmLink {
   iu restoreCount;
 
   pub VmLink (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet);
-  VmLink (const VmLink &) = delete;
-  VmLink &operator= (const VmLink &) = delete;
-  VmLink (VmLink &&) = delete;
-  VmLink &operator= (VmLink &&) = delete;
   pub void init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamicMemory);
 
   pub const char *getZcodeFileName () const noexcept;
