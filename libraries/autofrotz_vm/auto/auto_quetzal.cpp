@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <stdio.h>
 #include <string.h>
 #include "../common/frotz.h"
 
@@ -77,8 +76,14 @@ template<typename _T> static bool seekby (_T &f, long offset)
     return f.seekBy(offset);
 }
 
+#ifdef EOF
+#undef EOF
+#endif
+#define EOF (static_cast<iu64>(1) << 62)
+
 static int get_c(ZbyteReader &f)
 {
+    DSA(sizeof(EOF) > sizeof(int), "");
     return f.getByte();
 }
 
@@ -114,7 +119,8 @@ static bool write_word(ZbyteWriter &f, int c)
 /* Read one word from file; return TRUE if OK. */
 static bool read_word (ZbyteReader &f, zword *result)
 {
-    iu32 w;
+    zword w;
+    DSA(sizeof(EOF) > sizeof(zword), "");
     if ((w = f.getWord()) == EOF) return false;
 
     *result = w;
@@ -124,7 +130,8 @@ static bool read_word (ZbyteReader &f, zword *result)
 /* Read one long from file; return TRUE if OK. */
 static bool read_long (ZbyteReader &f, zlong *result)
 {
-    iu32 h, l;
+    zword h, l;
+    DSA(sizeof(EOF) > sizeof(zword), "");
     if ((h = f.getWord()) == EOF) return false;
     if ((l = f.getWord()) == EOF) return false;
 
@@ -368,10 +375,9 @@ zword auto_restore_quetzal (ZbyteReader &svf, ZbyteReader &stf)
 			    /* Copy story file to memory during the run. */
 			    --currlen;
 			    if ((x = get_c (svf)) == EOF)	return fatal;
-			    for (; x >= 0 && i<h_dynamic_size; --x, ++i)
-				if ((y = get_c (stf)) == EOF)	return fatal;
-				else
-				    zmp[i] = (zbyte) y;
+			    zword runlen = std::min<zword>(x + 1, h_dynamic_size - i);
+			    stf.copy(zmp + i, runlen);
+			    i += runlen;
 			}
 			else	/* Not a run. */
 			{
@@ -389,10 +395,11 @@ zword auto_restore_quetzal (ZbyteReader &svf, ZbyteReader &stf)
 			}
 		    }
 		    /* If chunk is short, assume a run. */
-		    for (; i<h_dynamic_size; ++i)
-			if ((y = get_c (stf)) == EOF)		return fatal;
-			else
-			    zmp[i] = (zbyte) y;
+		    if (i < h_dynamic_size)
+		    {
+		        zword runlen = h_dynamic_size - i;
+		        stf.copy(zmp + i, runlen);
+		    }
 		    if (currlen == 0)
 			progress |= GOT_MEMORY;	/* Only if succeeded. */
 		    break;
@@ -418,6 +425,7 @@ zword auto_restore_quetzal (ZbyteReader &svf, ZbyteReader &stf)
 	print_string ("error: no valid stack (`Stks') chunk in file.\n");
     if (!(progress & GOT_MEMORY))
 	print_string ("error: no valid memory (`CMem' or `UMem') chunk in file.\n");
+    DA(svf.atEnd());
 
     return (progress == GOT_ALL ? 2 : fatal);
 }
@@ -596,6 +604,11 @@ zword auto_restore_quetzal ()
     }
 
     ZbyteReader stateReader = vmLink->createRestoreStateReader();
+    if (stateReader.atEnd())
+    {
+        print_string ("The State to restore from is empty.\n");
+        return 0;
+    }
     ZbyteReader storyReader = vmLink->createInitialDynamicMemoryReader();
     zword r = auto_restore_quetzal (stateReader, storyReader);
     if (r == 2)
@@ -619,6 +632,11 @@ zword auto_save_quetzal ()
     if (r == 1)
     {
         vmLink->saveSucceeded ();
+    }
+    else
+    {
+      ZbyteWriter stateWriter = vmLink->createSaveStateWriter();
+      DA(stateWriter.tell() == 0);
     }
     return r;
 }

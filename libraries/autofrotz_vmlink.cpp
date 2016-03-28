@@ -34,7 +34,7 @@ void VmLink::init (iu32 memorySize, iu16 dynamicMemorySize, const zbyte *dynamic
   this->dynamicMemorySize = dynamicMemorySize;
   this->dynamicMemory = dynamicMemory;
   initialDynamicMemory.reset(new zbyte[dynamicMemorySize]);
-  copy(dynamicMemory, dynamicMemory + dynamicMemorySize, initialDynamicMemory.get());
+  memcpy(initialDynamicMemory.get(), dynamicMemory, dynamicMemorySize);
   DW(, "word set enabled? ", !!wordSet.get());
   if (wordSet.get()) {
     wordSet->ensureWidth(dynamicMemorySize);
@@ -88,7 +88,7 @@ uchar VmLink::readInput () {
 
     {
       char8_t b[(inputEnd - inputI) + 1];
-      std::copy(inputI, inputEnd, b);
+      copy(inputI, inputEnd, b);
       b[inputEnd - inputI] = u8("\0")[0];
       DW(, "input got!! is **", b, "** (of length ", (inputEnd - inputI), ")");
     }
@@ -287,22 +287,27 @@ bool ZbyteReader::seekBy (long offset) {
   return seekTo((i + offset) - begin);
 }
 
-iu16 ZbyteReader::getByte () noexcept {
-  if (i >= end) {
-    return EOF;
-  }
-
+zbyte ZbyteReader::getByte () noexcept {
+  DPRE(i < end);
   return *(i++);
 }
 
-iu32 ZbyteReader::getWord () noexcept {
-  if (i + 1 >= end) {
-    return EOF;
-  }
-
+zword ZbyteReader::getWord () noexcept {
+  DPRE(i + 1 < end);
   zbyte h = *(i++);
   zbyte l = *(i++);
   return static_cast<zword>(static_cast<zword>(h << 8) | l);
+}
+
+void ZbyteReader::copy (zbyte *out, size_t s) noexcept {
+  DPRE(i + s <= end);
+  memcpy(out, i, s);
+  i += s;
+}
+
+bool ZbyteReader::atEnd () const noexcept {
+  DA(i <= end);
+  return i == end;
 }
 
 ZbyteWriter::ZbyteWriter (string<zbyte> &r_b) :

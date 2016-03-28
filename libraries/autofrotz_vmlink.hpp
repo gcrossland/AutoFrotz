@@ -106,8 +106,10 @@ class ZbyteReader {
   pub long tell () const noexcept;
   pub bool seekTo (long offset);
   pub bool seekBy (long offset);
-  pub iu16 getByte () noexcept;
-  pub iu32 getWord () noexcept;
+  pub zbyte getByte () noexcept;
+  pub zword getWord () noexcept;
+  pub void copy (zbyte *out, size_t s) noexcept;
+  pub bool atEnd () const noexcept;
 };
 
 class ZbyteWriter {
