@@ -1,5 +1,8 @@
-import os, imp
-sconsutils = imp.load_source('sconsutils', os.path.join(os.pardir, os.pardir, "build", "sconsutils.py"))
+import sys
+try:
+  import sconsutils
+except ImportError:
+  raise ImportError("Failed to import sconsutils (is buildtools on PYTHONPATH?)"), None, sys.exc_traceback
 
 env = sconsutils.getEnv()
 env.InVariantDir(env['oDir'], ".", lambda env: env.LibAndApp('autofrotz', 0, -1, (
