@@ -66,7 +66,7 @@ enum input_type {
 static int xgetchar(void)
 {
   uchar c = vmLink->readInput();
-  if (c > UCHAR_MAX) {
+  if (c > std::numeric_limits<zchar>::max()) {
     os_fatal("Input character not supported");
   }
   return c;

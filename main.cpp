@@ -1,5 +1,6 @@
 #include "header.hpp"
 #include <cstring>
+#include <climits>
 
 using std::printf;
 using autofrotz::Vm;

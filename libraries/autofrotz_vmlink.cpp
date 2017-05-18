@@ -1,5 +1,6 @@
 #include "autofrotz_vmlink.hpp"
 #include <cstdio>
+#include <cstring>
 
 namespace autofrotz { namespace vmlink {
 
