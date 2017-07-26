@@ -1,7 +1,7 @@
 /** @file */
 /* -----------------------------------------------------------------------------
    AutoFrotz Library
-   © Geoff Crossland 2003, 2006, 2013-2016
+   © Geoff Crossland 2003, 2006, 2013-2017
 ----------------------------------------------------------------------------- */
 #ifndef AUTOFROTZ_ALREADYINCLUDED
 #define AUTOFROTZ_ALREADYINCLUDED
@@ -29,8 +29,8 @@ class Vm {
 
     @param zcodeFileName the Z-code file (giving the VM's initial memory) to
     run.
-    @param enableWordSet whether ot not the VM will initially track which
-    addresses are accessed as words.
+    @param enableWordSet whether ot not the VM will track which addresses are
+    written to as words.
     @param r_output buffer for the VM's initial output.
   */
   pub Vm (const char *zcodeFileName, iu screenWidth, iu screenHeight, iu undoDepth, bool enableWordSet, core::u8string &r_output);
@@ -58,20 +58,11 @@ class Vm {
   */
   pub const zbyte *getInitialDynamicMemory () const noexcept;
   /**
-    Gets the word set (valid until the next call to ::setWordSet() or
-    ::disableWordSet() or destruction) or {@c nullptr}, if not enabled.
-    If a dynamic memory address {@c a} is used as the first byte of a word,
-    bit {@c a} is set.
+    Gets the word set (valid until destruction) or {@c nullptr}, if not enabled.
+    If dynamic memory address {@c a} is written to as the first byte of a word,
+    the Z-machine sets bit {@c a}.
   */
-  pub const bitset::Bitset *getWordSet () const noexcept;
-  /**
-    Sets the word set.
-  */
-  pub void setWordSet (bitset::Bitset &&wordSet);
-  /**
-    Disables word access tracking.
-  */
-  pub void disableWordSet () noexcept;
+  pub bitset::Bitset *getWordSet () noexcept;
   /**
     Returns whether or not the Z-machine is alive.
   */

@@ -1,7 +1,7 @@
 /** @file */
 /* -----------------------------------------------------------------------------
    AutoFrotz VmLink Library
-   © Geoff Crossland 2003, 2006, 2013-2016
+   © Geoff Crossland 2003, 2006, 2013-2017
 ----------------------------------------------------------------------------- */
 #ifndef AUTOFROTZ_VMLINK_ALREADYINCLUDED
 #define AUTOFROTZ_VMLINK_ALREADYINCLUDED
@@ -79,9 +79,7 @@ class VmLink {
   pub iu16 getDynamicMemorySize () const noexcept;
   pub const zbyte *getDynamicMemory () const noexcept;
   pub const zbyte *getInitialDynamicMemory () const noexcept;
-  pub const bitset::Bitset *getWordSet () const noexcept;
-  pub void setWordSet (bitset::Bitset &&initialWordSet);
-  pub void disableWordSet () noexcept;
+  pub bitset::Bitset *getWordSet () noexcept;
   pub bool isAlive () const noexcept;
   pub void checkForFailure () const;
   pub void waitForInputExhaustion ();

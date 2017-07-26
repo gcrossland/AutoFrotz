@@ -12,7 +12,6 @@ using std::current_exception;
 using std::thread;
 using core::u8string;
 using bitset::Bitset;
-using std::move;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
@@ -70,16 +69,8 @@ const zbyte *Vm::getInitialDynamicMemory () const noexcept {
   return vmLink.getInitialDynamicMemory();
 }
 
-const Bitset *Vm::getWordSet () const noexcept {
+Bitset *Vm::getWordSet () noexcept {
   return vmLink.getWordSet();
-}
-
-void Vm::setWordSet (Bitset &&wordSet) {
-  vmLink.setWordSet(move(wordSet));
-}
-
-void Vm::disableWordSet () noexcept {
-  vmLink.disableWordSet();
 }
 
 bool Vm::isAlive () const noexcept {

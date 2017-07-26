@@ -12,7 +12,6 @@ using core::string;
 using std::exception_ptr;
 using std::rethrow_exception;
 using bitset::Bitset;
-using std::move;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
@@ -87,11 +86,14 @@ uchar VmLink::readInput () {
       throw core::PlainException(u8("VM has been killed"));
     }
 
-    {
+    DI(
       char8_t b[(inputEnd - inputI) + 1];
       copy(inputI, inputEnd, b);
       b[inputEnd - inputI] = u8("\0")[0];
       DW(, "input got!! is **", b, "** (of length ", (inputEnd - inputI), ")");
+    )
+    if (wordSet.get()) {
+      wordSet->ensureWidth(dynamicMemorySize);
     }
   }
 
@@ -176,17 +178,8 @@ const zbyte *VmLink::getInitialDynamicMemory () const noexcept {
   return initialDynamicMemory.get();
 }
 
-const Bitset *VmLink::getWordSet () const noexcept {
+Bitset *VmLink::getWordSet () noexcept {
   return wordSet.get();
-}
-
-void VmLink::setWordSet (Bitset &&initialWordSet) {
-  wordSet.reset(new Bitset(move(initialWordSet)));
-  wordSet->ensureWidth(dynamicMemorySize);
-}
-
-void VmLink::disableWordSet () noexcept {
-  wordSet.reset();
 }
 
 bool VmLink::isAlive () const noexcept {
