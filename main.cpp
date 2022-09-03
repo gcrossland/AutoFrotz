@@ -69,7 +69,7 @@ int main (int argc, char *argv[]) {
 
     // Parse out our own internal commands for setting save and
     // restore state blocks.
-    if (strcmp(inbuffer, u8("setsave")) == 0) {
+    if (strcmp(inbuffer, u8"setsave") == 0) {
       if (currentSaveIndex == -1) {
         printf("[No current save slot]\n");
       } else {
@@ -91,7 +91,7 @@ int main (int argc, char *argv[]) {
         vm.setSaveState(s + currentSaveIndex);
         printf("[New save slot is %d]\n", currentSaveIndex);
       }
-    } else if (strcmp(inbuffer, u8("setrestore")) == 0) {
+    } else if (strcmp(inbuffer, u8"setrestore") == 0) {
       if (currentRestoreIndex == -1) {
         printf("[No current restore slot]\n");
       } else {
@@ -113,11 +113,11 @@ int main (int argc, char *argv[]) {
         vm.setRestoreState(s + currentRestoreIndex);
         printf("[New restore slot is %d]\n", currentRestoreIndex);
       }
-    } else if (strcmp(inbuffer, u8("benchmark")) == 0) {
-      vm.doAction(u8("verbose\n"), output);
+    } else if (strcmp(inbuffer, u8"benchmark") == 0) {
+      vm.doAction(u8"verbose\n", output);
       output.clear();
 
-      const char8_t *const runInput = u8("east\ntake lamp\nexit\nwest\neast, east\ndrop lamp\nwest\n");
+      const char8_t *const runInput = u8"east\ntake lamp\nexit\nwest\neast, east\ndrop lamp\nwest\n";
       pair<iu, iu> ts[] = {{2, 2}, {1, 4096}, {16, 256}, {256, 16}, {4096, 1}};
       for (auto t : ts) {
         const iu runsPerAction = get<0>(t);
@@ -139,10 +139,10 @@ int main (int argc, char *argv[]) {
       DA(vm.isAlive());
 
       u8string in(inbuffer);
-      if (strcmp(inbuffer, u8(".")) == 0) {
-        in = u8("\1\n");
+      if (strcmp(inbuffer, u8".") == 0) {
+        in = u8"\1\n";
       } else {
-        in.push_back(u8("\n")[0]);
+        in.push_back(u8'\n');
       }
 
       try {
@@ -180,11 +180,11 @@ size_t readLine (char8_t *b, size_t bSize) {
   size_t size = 0;
   for (; b[size] != 0; ++size) {
     if (b[size] >= 128) {
-      b[size] = u8("?")[0];
+      b[size] = u8'?';
     }
   }
-  if (size > 0 && b[size - 1] == u8("\n")[0]) {
-    b[--size] = u8("\0")[0];
+  if (size > 0 && b[size - 1] == u8'\n') {
+    b[--size] = u8'\0';
   }
   return size;
 }
@@ -203,7 +203,7 @@ void printOutput (const char8_t *begin, const char8_t *end) {
   printf("=* ");
   for (auto i = begin; i != end; ++i) {
     char8_t c = *i;
-    if (c == u8("\n")[0]) {
+    if (c == u8'\n') {
       for (; linelen < WIDTH; linelen++) {
         putchar(' ');
       }

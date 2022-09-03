@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace autofrotz { namespace vmlink {
+namespace autofrotz::vmlink {
 
 using core::u8string;
 using std::copy;
@@ -12,6 +12,7 @@ using core::string;
 using std::exception_ptr;
 using std::rethrow_exception;
 using bitset::Bitset;
+using core::offset;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
@@ -83,13 +84,13 @@ uchar VmLink::readInput () {
       // We're supposed to be dead, so oblige.
       DW(, "input got... except we've been told to die");
       // DODGY
-      throw core::PlainException(u8("VM has been killed"));
+      throw core::PlainException(u8"VM has been killed");
     }
 
     DI(
-      char8_t b[(inputEnd - inputI) + 1];
+      char8_t b[offset(inputI, inputEnd) + 1];
       copy(inputI, inputEnd, b);
-      b[inputEnd - inputI] = u8("\0")[0];
+      b[inputEnd - inputI] = u8'\0';
       DW(, "input got!! is **", b, "** (of length ", (inputEnd - inputI), ")");
     )
     if (wordSet.get()) {
@@ -358,4 +359,4 @@ const iu lowerWindowHeadroom = 32;
 
 /* -----------------------------------------------------------------------------
 ----------------------------------------------------------------------------- */
-}}
+}

@@ -1,7 +1,7 @@
 /** @file */
 /* -----------------------------------------------------------------------------
    AutoFrotz Library
-   © Geoff Crossland 2003, 2006, 2013-2017
+   © Geoff Crossland 2003-2022
 ----------------------------------------------------------------------------- */
 #ifndef AUTOFROTZ_ALREADYINCLUDED
 #define AUTOFROTZ_ALREADYINCLUDED

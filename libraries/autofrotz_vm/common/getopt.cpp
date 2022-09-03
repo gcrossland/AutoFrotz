@@ -8,6 +8,7 @@
  *
  */
 
+#ifndef AUTOFROTZ
 #include <stdio.h>
 #include <string.h>
 #include "frotz.h"
@@ -71,3 +72,4 @@ error:
     return '?';
 
 }/* getopt */
+#endif
